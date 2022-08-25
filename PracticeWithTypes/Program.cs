@@ -9,6 +9,7 @@ namespace PracticeWithTypes
         static void Main(string[] args)
         {
             Bank bank = new Bank();
+
             Client client = new Client() { FirstName = "Владислав", LastName="Богорош", Patronymic = "Владимирович", BirthDate = DateTime.Parse("11.06.22"), Passport = 1 };
             var employee = bank.ConvertClientToEmployee(client);
             Console.WriteLine(employee.Passport);

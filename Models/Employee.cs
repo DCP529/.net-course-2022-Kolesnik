@@ -10,14 +10,5 @@ namespace Models
         public string Patronymic { get; set; }
         public DateTime BirthDate { get; set; }
         public string Contract { get; set; }
-
-
-        public Employee(string firstName, string lastName, string patronymic, int passport, DateTime birthDate) : base(firstName, lastName, patronymic, passport, birthDate)
-        {
-        }
-
-        public Employee()
-        {
-        }
     }
 }

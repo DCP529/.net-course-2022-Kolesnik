@@ -14,12 +14,16 @@ namespace BankService
 
         public Employee ConvertClientToEmployee(Client client)
         {
-            Employee employee = new Employee() { FirstName = client.FirstName, LastName = client.LastName,
-                Passport = client.Passport, BirthDate = client.BirthDate, Patronymic = client.Patronymic};
+            Employee employee = new Employee() 
+            { 
+                FirstName = client.FirstName,
+                LastName = client.LastName,
+                Passport = client.Passport,
+                BirthDate = client.BirthDate,
+                Patronymic = client.Patronymic
+            };
 
             return employee;
-        }
-
-        
+        }        
     }
 }

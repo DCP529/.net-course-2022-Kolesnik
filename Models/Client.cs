@@ -6,12 +6,5 @@ namespace Models
 {
     public class Client : Person
     {
-        public Client()
-        {
-        }
-
-        public Client(string firstName, string lastName, string patronymic, int passport, DateTime birthDate) : base(firstName, lastName, patronymic, passport, birthDate)
-        {
-        }
     }
 }
