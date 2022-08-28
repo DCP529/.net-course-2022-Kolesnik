@@ -2,7 +2,7 @@
 using Models;
 using System;
 
-namespace PracticeWithTypes
+namespace Tools
 {
     class Program
     {
