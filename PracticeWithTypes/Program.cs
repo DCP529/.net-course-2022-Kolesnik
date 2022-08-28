@@ -1,6 +1,6 @@
-﻿using Models;
+﻿using Services;
+using Models;
 using System;
-using BankService;
 
 namespace PracticeWithTypes
 {
@@ -8,7 +8,7 @@ namespace PracticeWithTypes
     {
         static void Main(string[] args)
         {
-            Bank bank = new Bank();
+            BankService bank = new BankService();        
 
             Client client = new Client() { FirstName = "Владислав", LastName="Богорош", Patronymic = "Владимирович", BirthDate = DateTime.Parse("11.06.22"), Passport = 1 };
             var employee = bank.ConvertClientToEmployee(client);
@@ -20,7 +20,7 @@ namespace PracticeWithTypes
             employee.Contract = UpdateContactFromString("Олег", "Диордиев", "Михайлович", DateTime.Parse("01.05.22"), 12);
             Console.WriteLine(employee.Contract);
 
-            var rub = UpdateCurrency("Рубль", 16.35M, 0809);
+            var rub = UpdateCurrency("Рубль", 0809);
 
             Console.WriteLine(rub.Name);
             Console.ReadLine();
@@ -37,9 +37,9 @@ namespace PracticeWithTypes
             return $"{firstName} {lastName} {patronymic}, родившийся {dataTime}, с пасспартом {passport} принят на работу в Dex!";
         }
 
-        public static Currency UpdateCurrency(string name, decimal cost, int code)
+        public static Currency UpdateCurrency(string name, int code)
         {
-            return new Currency() { Name = name, Code = code, Cost = cost};
+            return new Currency() { Name = name, Code = code};
         }
     }
 }

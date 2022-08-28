@@ -2,9 +2,9 @@
 using System;
 
 
-namespace BankService
+namespace Services
 {
-    public class Bank
+    public class BankService
     {
         public decimal Payroll(decimal bankProfit, decimal expenses, params Employee[] owners)
         {
