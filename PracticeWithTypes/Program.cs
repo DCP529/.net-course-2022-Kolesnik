@@ -1,6 +1,9 @@
 ﻿using Services;
 using Models;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
 
 namespace Tools
 {
@@ -8,21 +11,91 @@ namespace Tools
     {
         static void Main(string[] args)
         {
-            BankService bank = new BankService();        
+            TestDataGenerator dataGenerator = new TestDataGenerator();
 
-            Client client = new Client() { FirstName = "Владислав", LastName="Богорош", Patronymic = "Владимирович", BirthDate = DateTime.Parse("11.06.22"), Passport = 1 };
-            var employee = bank.ConvertClientToEmployee(client);
-            Console.WriteLine(employee.Passport);
+            #region ListSearch
+            List<Client> clientsList = new List<Client>();
+            clientsList = dataGenerator.GenerateListClient();
 
-            UpdateContactFromEmployee(employee);
-            Console.WriteLine(employee.Contract);
+            Client testClient = clientsList[50];
 
-            employee.Contract = UpdateContactFromString("Олег", "Диордиев", "Михайлович", DateTime.Parse("01.05.22"), 12);
-            Console.WriteLine(employee.Contract);
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
 
-            var rub = UpdateCurrency("Рубль", 0809);
+            var resultClientList = clientsList.FirstOrDefault(c => c.Phone == testClient.Phone);
+            stopwatch.Stop();
 
-            Console.WriteLine(rub.Name);
+            Console.WriteLine(resultClientList.FirstName);
+            Console.WriteLine($"Время затраченнное на поиск по списку = {stopwatch.ElapsedTicks}\n");
+            #endregion
+
+            #region DictionarySearch
+            var clientsDictionary = new Dictionary<int, Client>();
+            clientsDictionary = dataGenerator.GenerateDictionaryClient();
+
+            testClient = clientsDictionary[50];
+
+
+            stopwatch.Restart();
+
+            var resultClientDictionary = clientsDictionary.FirstOrDefault(c => c.Key == testClient.Phone);
+
+            stopwatch.Stop();
+
+
+            Console.WriteLine(resultClientDictionary.Value.FirstName);
+
+            Console.WriteLine($"Время затраченнное на поиск по словарю = {stopwatch.ElapsedTicks}\n");
+            #endregion
+
+            #region BabyClient
+            Console.WriteLine("Поиск клиентов возраст которых меньше 10 лет");
+
+            var baby = clientsList.Where(b => b.BirthDate >= DateTime.Parse("01.01.2012")).ToList();
+
+            foreach (var item in baby)
+            {
+                Console.WriteLine(item.FirstName);
+            }
+            #endregion
+
+            #region minSalary
+            List<Employee> employees = new List<Employee>();
+            employees = dataGenerator.GenerateListEmployee();
+
+            var minEmployeeSalary = employees.Min(e => e.Salary);
+
+            var resultEmployeeList = employees.Where(e => e.Salary == minEmployeeSalary).ToList();
+
+            Console.WriteLine("\nСотрудники с минимальной зп:");
+            foreach (var item in resultEmployeeList)
+            {
+                Console.WriteLine(item.FirstName + " " + item.LastName);
+            }
+
+            Console.WriteLine($"Минимальная зп составляет: {minEmployeeSalary}\n");
+            #endregion
+
+            #region searchFirstOrDefault
+            stopwatch.Reset();
+            stopwatch.Start();
+
+            var firstOrDefount = clientsDictionary.FirstOrDefault(c => c.Key == clientsDictionary.Count - 1);
+            
+            stopwatch.Stop();
+
+            Console.WriteLine("Имя последнего клиента коллекции = " + firstOrDefount.Value.FirstName
+                + "а время его поиска заняло " + stopwatch.ElapsedTicks);
+            #endregion
+
+            stopwatch.Reset();
+            stopwatch.Start();
+
+            var lastClient = clientsDictionary[clientsDictionary.Count - 1];
+
+            stopwatch.Stop();
+
+            Console.WriteLine($"Поиск последнего элемента коллекции по ключу занял: {stopwatch.ElapsedTicks}");
             Console.ReadLine();
         }
 
@@ -39,7 +112,7 @@ namespace Tools
 
         public static Currency UpdateCurrency(string name, int code)
         {
-            return new Currency() { Name = name, Code = code};
+            return new Currency() { Name = name, Code = code };
         }
     }
 }
