@@ -22,7 +22,7 @@ namespace Tools
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            var resultClientList = clientsList.Where(c => c.Phone == testClient.Phone).First();
+            var resultClientList = clientsList.FirstOrDefault(c => c.Phone == testClient.Phone);
             stopwatch.Stop();
 
             Console.WriteLine(resultClientList.FirstName);
@@ -38,7 +38,7 @@ namespace Tools
 
             stopwatch.Restart();
 
-            var resultClientDictionary = clientsDictionary.Where(c => c.Key == testClient.Phone).First();
+            var resultClientDictionary = clientsDictionary.FirstOrDefault(c => c.Key == testClient.Phone);
 
             stopwatch.Stop();
 
