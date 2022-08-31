@@ -22,17 +22,11 @@ namespace Tools
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            var resultClientList = clientsList.Where(c => c.Phone == testClient.Phone).ToList();
-
-            foreach (var item in resultClientList)
-            {
-                Console.WriteLine(resultClientList[0].FirstName);
-            }
-
+            var resultClientList = clientsList.Where(c => c.Phone == testClient.Phone).First();
             stopwatch.Stop();
-            var timeClientList = stopwatch.ElapsedTicks;
 
-            Console.WriteLine($"Время затраченнное на поиск по списку = {timeClientList}\n");
+            Console.WriteLine(resultClientList.FirstName);
+            Console.WriteLine($"Время затраченнное на поиск по списку = {stopwatch.ElapsedTicks}\n");
             #endregion
 
             #region DictionarySearch
@@ -41,19 +35,17 @@ namespace Tools
 
             testClient = clientsDictionary[50];
 
+
             stopwatch.Restart();
 
-            var resultClientDictionary = clientsDictionary.Where(c => c.Key == testClient.Phone).ToList();
-
-            foreach (var item in resultClientDictionary)
-            {
-                Console.WriteLine(resultClientDictionary[0].Value.FirstName);
-            }
+            var resultClientDictionary = clientsDictionary.Where(c => c.Key == testClient.Phone).First();
 
             stopwatch.Stop();
-            var timeClientDictionary = stopwatch.ElapsedTicks;
 
-            Console.WriteLine($"Время затраченнное на поиск по словарю = {timeClientDictionary}\n");
+
+            Console.WriteLine(resultClientDictionary.Value.FirstName);
+
+            Console.WriteLine($"Время затраченнное на поиск по словарю = {stopwatch.ElapsedTicks}\n");
             #endregion
 
             #region BabyClient
@@ -88,8 +80,8 @@ namespace Tools
             stopwatch.Reset();
             stopwatch.Start();
 
-            var firstOrDefount = clientsDictionary.FirstOrDefault();
-
+            var firstOrDefount = clientsDictionary.FirstOrDefault(c => c.Key == clientsDictionary.Count - 1);
+            
             stopwatch.Stop();
 
             Console.WriteLine("Имя последнего клиента коллекции = " + firstOrDefount.Value.FirstName
@@ -99,7 +91,7 @@ namespace Tools
             stopwatch.Reset();
             stopwatch.Start();
 
-            var lastClient = clientsDictionary.Where(c => c.Key == clientsDictionary.Count);
+            var lastClient = clientsDictionary[clientsDictionary.Count - 1];
 
             stopwatch.Stop();
 
@@ -120,7 +112,7 @@ namespace Tools
 
         public static Currency UpdateCurrency(string name, int code)
         {
-            return new Currency() { Name = name, Code = code};
+            return new Currency() { Name = name, Code = code };
         }
     }
 }
