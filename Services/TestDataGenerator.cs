@@ -12,11 +12,11 @@ namespace Services
     {
         public List<Client> GenerateListClient()
         {
+            int i = 0;
+
             List<Client> clients = new List<Client>();
 
-            for (int i = 0; i <= 999; i++)
-            {
-                Faker<Client> generator = new Faker<Client>()
+            Faker<Client> generator = new Faker<Client>()
     .StrictMode(true)
     .RuleFor(x => x.FirstName, f => f.Name.FirstName())
     .RuleFor(x => x.LastName, f => f.Name.LastName())
@@ -25,18 +25,21 @@ namespace Services
     .RuleFor(x => x.Phone, f => 77500000 + i)
     .RuleFor(x => x.BirthDate, f => f.Date.Between(DateTime.Parse("01.01.1990"), DateTime.Now));
 
+            for (i = 0; i <= 999; i++)
+            {
                 clients.Add(generator.Generate());
             }
 
             return clients;
         }
+
         public List<Employee> GenerateListEmployee()
         {
+            int i = 0;
+
             List<Employee> employees = new List<Employee>();
 
-            for (int i = 0; i <= 999; i++)
-            {
-                Faker<Employee> generator = new Faker<Employee>()
+            Faker<Employee> generator = new Faker<Employee>()
     .StrictMode(true)
     .RuleFor(x => x.FirstName, f => f.Name.FirstName())
     .RuleFor(x => x.LastName, f => f.Name.LastName())
@@ -47,18 +50,21 @@ namespace Services
     .RuleFor(x => x.Contract, f => "")
     .RuleFor(x => x.BirthDate, f => f.Date.Between(DateTime.Parse("01.01.1990"), DateTime.Now));
 
+            for ( i = 0; i <= 999; i++)
+            {
                 employees.Add(generator.Generate());
             }
 
             return employees;
         }
+
         public Dictionary<int, Client> GenerateDictionaryClient()
         {
+            int i = 0;
+
             Dictionary<int, Client> clients = new Dictionary<int, Client>();
 
-            for (int i = 0; i <= 999; i++)
-            {
-                Faker<Client> generator = new Faker<Client>()
+            Faker<Client> generator = new Faker<Client>()
     .StrictMode(true)
     .RuleFor(x => x.FirstName, f => f.Name.FirstName())
     .RuleFor(x => x.LastName, f => f.Name.LastName())
@@ -67,6 +73,8 @@ namespace Services
     .RuleFor(x => x.Phone, f => 77500000 + i)
     .RuleFor(x => x.BirthDate, f => f.Date.Between(DateTime.Parse("01.01.1990"), DateTime.Now));
 
+            for (i = 0; i <= 999; i++)
+            {                
                 var fakeClient = generator.Generate();
                 clients.Add(fakeClient.Phone, fakeClient);
             }
@@ -78,15 +86,20 @@ namespace Services
         {
             Dictionary<Client, List<Account>> clients = new Dictionary<Client, List<Account>>();
 
-            List<string> fakeCurrencyName = new List<string>()
-                {
-                    "Rub",
-                    "Lei",
-                    "Eu",
-                    "Ua"
-                };
-
             var fakeClients = GenerateListClient();
+
+            string[] fakeCurrencyName = {"Rub", "Lei", "Eu", "Ua"};           
+
+            var currency = new Currency()
+            {
+                Name = fakeCurrencyName[new Random().Next(fakeCurrencyName.Length)],
+                Code = new Random().Next(1000)
+            };
+
+            Faker<Account> generatorAccount = new Faker<Account>()
+            .StrictMode(true)
+            .RuleFor(x => x.Amount, c => c.Random.Int(1, 1000))
+            .RuleFor(x => x.Currency, c => currency);
 
             for (int i = 0; i <= 999; i++)
             {
@@ -94,16 +107,11 @@ namespace Services
 
                 for (int j = 0; j < 2; j++)
                 {
-                    var currency = new Currency()
+                    currency = new Currency()
                     {
-                        Name = fakeCurrencyName[new Random().Next(fakeCurrencyName.Count)],
+                        Name = fakeCurrencyName[new Random().Next(fakeCurrencyName.Length)],
                         Code = new Random().Next(1000)
                     };
-
-                    Faker<Account> generatorAccount = new Faker<Account>()
-                    .StrictMode(true)
-                    .RuleFor(x => x.Amount, c => c.Random.Int(1, 1000))
-                    .RuleFor(x => x.Currency, c => currency);
 
                     fakeAccountList.Add(generatorAccount.Generate());
                 }

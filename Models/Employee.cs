@@ -13,7 +13,7 @@ namespace Models
             {
                 return false;
             }
-            if (!(obj is Client))
+            if (!(obj is Employee))
             {
                 return false;
             }
@@ -28,18 +28,6 @@ namespace Models
                 && BirthDate == result.BirthDate
                 && Contract == result.Contract
                 && Salary == result.Salary;
-        }
-
-        public override int GetHashCode()
-        {
-            return FirstName.GetHashCode()
-                + LastName.GetHashCode()
-                + Passport.GetHashCode()
-                + Patronymic.GetHashCode()
-                + Phone.GetHashCode()
-                + BirthDate.GetHashCode()
-                + Contract.GetHashCode()
-                + Salary.GetHashCode();
         }
     }
 }
