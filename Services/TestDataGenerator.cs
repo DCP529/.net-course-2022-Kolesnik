@@ -77,13 +77,15 @@ namespace Services
         public Dictionary<Client, List<Account>> GenerateDictionaryClientAccount()
         {
             Dictionary<Client, List<Account>> clients = new Dictionary<Client, List<Account>>();
+
             List<string> fakeCurrencyName = new List<string>()
                 {
                     "Rub",
                     "Lei",
                     "Eu",
                     "Ua"
-                };         
+                };
+
 
             for (int i = 0; i <= 999; i++)
             {
@@ -103,9 +105,8 @@ namespace Services
                     .RuleFor(x => x.Currency, c => currency);
 
                     fakeAccountList.Add(generatorAccount.Generate());
-                }                
-
-                Faker<Client> generatorClient = new Faker<Client>() 
+                }
+                Faker<Client> generatorClient = new Faker<Client>()
     .StrictMode(true)
     .RuleFor(x => x.FirstName, f => f.Name.FirstName())
     .RuleFor(x => x.LastName, f => f.Name.LastName())
