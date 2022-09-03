@@ -29,5 +29,15 @@ namespace Models
                 && Contract == result.Contract
                 && Salary == result.Salary;
         }
+
+        public static bool operator ==(Employee firstEmployee, Employee secondEmployee)
+        {
+            return firstEmployee.Equals(secondEmployee);
+        }
+
+        public static bool operator !=(Employee firstEmployee, Employee secondEmployee)
+        {
+            return !firstEmployee.Equals(secondEmployee);
+        }
     }
 }

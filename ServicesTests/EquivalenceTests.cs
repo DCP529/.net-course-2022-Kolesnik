@@ -40,26 +40,18 @@ namespace ServicesTests
         {
             //Arange
             var dataGenerator = new TestDataGenerator();
+
             var employeeList = dataGenerator.GenerateListEmployee();
+            employeeList.Add(new Employee() { Phone = 77700001 });
 
             //Act
-            var employee1 = employeeList.FirstOrDefault(c => c.Phone == 77500001);
-            var employee2 = employeeList.Find(x => x == employee1);
 
-            var employee = new Employee()
-            {
-                BirthDate = employee2.BirthDate,
-                FirstName = employee2.FirstName,
-                LastName = employee2.LastName,
-                Salary = employee2.Salary,
-                Passport = employee2.Passport,
-                Patronymic = employee2.Patronymic,
-                Phone = employee2.Phone,
-                Contract = employee2.Contract
-            };
+            var employee = new Employee() { Phone = 77700001 };
+
+            var findEmployee = employeeList.Find(e => e == employee);
 
             //Asert
-            Assert.Equal(employee, employee2);
+            Assert.NotNull(findEmployee);
         }
 
     }
