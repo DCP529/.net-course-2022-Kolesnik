@@ -4,10 +4,10 @@ using System.Text;
 
 namespace Models
 {
-    public struct Currency
+    public class Account
     {
-        public string Name { get; set; }
-        public int Code { get; set; }
+        public Currency Currency { get; set; }
+        public int Amount { get; set; }
 
         public override bool Equals(object obj)
         {
@@ -20,16 +20,17 @@ namespace Models
                 return false;
             }
 
-            var result = (Currency)obj;
+            var result = (Account)obj;
 
-            return Name == result.Name
-                && Code == result.Code;
+            return Currency.Equals(result.Currency)
+                && Amount == result.Amount;
+
         }
 
         public override int GetHashCode()
         {
-            return Name.GetHashCode()
-                + Code.GetHashCode();
+            return Currency.GetHashCode()
+                + Amount.GetHashCode();
         }
     }
 }
