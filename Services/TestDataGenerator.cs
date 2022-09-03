@@ -86,6 +86,7 @@ namespace Services
                     "Ua"
                 };
 
+            var fakeClients = GenerateListClient();
 
             for (int i = 0; i <= 999; i++)
             {
@@ -106,18 +107,8 @@ namespace Services
 
                     fakeAccountList.Add(generatorAccount.Generate());
                 }
-                Faker<Client> generatorClient = new Faker<Client>()
-    .StrictMode(true)
-    .RuleFor(x => x.FirstName, f => f.Name.FirstName())
-    .RuleFor(x => x.LastName, f => f.Name.LastName())
-    .RuleFor(x => x.Patronymic, f => "")
-    .RuleFor(x => x.Passport, f => f.Random.Int(1, 1000))
-    .RuleFor(x => x.Phone, f => 77500000 + i)
-    .RuleFor(x => x.BirthDate, f => f.Date.Between(DateTime.Parse("01.01.1990"), DateTime.Now));
 
-                var fakeClient = generatorClient.Generate();
-
-                clients.Add(fakeClient, fakeAccountList);
+                clients.Add(fakeClients[i], fakeAccountList);
             }
 
             return clients;

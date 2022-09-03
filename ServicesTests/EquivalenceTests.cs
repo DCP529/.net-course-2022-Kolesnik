@@ -33,7 +33,7 @@ namespace ServicesTests
 
             //Act
             var employee1 = employeeList.FirstOrDefault(c => c.Phone == 77500001);
-            var employee2 = employeeList[employee1.Phone];
+            var employee2 = employeeList.Find(x => x == employee1);
 
             //Asert
             Assert.Equal(employee1, employee2);
