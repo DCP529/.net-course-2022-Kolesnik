@@ -22,7 +22,7 @@ namespace Services
     .RuleFor(x => x.LastName, f => f.Name.LastName())
     .RuleFor(x => x.Patronymic, f => "")
     .RuleFor(x => x.Passport, f => f.Random.Int(1, 500))
-    .RuleFor(x => x.Phone, f => i)
+    .RuleFor(x => x.Phone, f => 77500000 + i)
     .RuleFor(x => x.BirthDate, f => f.Date.Between(DateTime.Parse("01.01.1990"), DateTime.Now));
 
                 clients.Add(generator.Generate());
@@ -42,7 +42,7 @@ namespace Services
     .RuleFor(x => x.LastName, f => f.Name.LastName())
     .RuleFor(x => x.Patronymic, f => "")
     .RuleFor(x => x.Passport, f => f.Random.Int(1, 500))
-    .RuleFor(x => x.Phone, f => i)
+    .RuleFor(x => x.Phone, f => 77500000 + i)
     .RuleFor(x => x.Salary, f => f.Random.Decimal(1_000, 100_000))
     .RuleFor(x => x.Contract, f => "")
     .RuleFor(x => x.BirthDate, f => f.Date.Between(DateTime.Parse("01.01.1990"), DateTime.Now));
@@ -64,7 +64,7 @@ namespace Services
     .RuleFor(x => x.LastName, f => f.Name.LastName())
     .RuleFor(x => x.Patronymic, f => "")
     .RuleFor(x => x.Passport, f => f.Random.Int(1, 1000))
-    .RuleFor(x => x.Phone, f => i)
+    .RuleFor(x => x.Phone, f => 77500000 + i)
     .RuleFor(x => x.BirthDate, f => f.Date.Between(DateTime.Parse("01.01.1990"), DateTime.Now));
 
                 var fakeClient = generator.Generate();
@@ -77,13 +77,15 @@ namespace Services
         public Dictionary<Client, List<Account>> GenerateDictionaryClientAccount()
         {
             Dictionary<Client, List<Account>> clients = new Dictionary<Client, List<Account>>();
+
             List<string> fakeCurrencyName = new List<string>()
                 {
                     "Rub",
                     "Lei",
                     "Eu",
                     "Ua"
-                };         
+                };
+
 
             for (int i = 0; i <= 999; i++)
             {
@@ -103,15 +105,14 @@ namespace Services
                     .RuleFor(x => x.Currency, c => currency);
 
                     fakeAccountList.Add(generatorAccount.Generate());
-                }                
-
-                Faker<Client> generatorClient = new Faker<Client>() 
+                }
+                Faker<Client> generatorClient = new Faker<Client>()
     .StrictMode(true)
     .RuleFor(x => x.FirstName, f => f.Name.FirstName())
     .RuleFor(x => x.LastName, f => f.Name.LastName())
     .RuleFor(x => x.Patronymic, f => "")
     .RuleFor(x => x.Passport, f => f.Random.Int(1, 1000))
-    .RuleFor(x => x.Phone, f => i)
+    .RuleFor(x => x.Phone, f => 77500000 + i)
     .RuleFor(x => x.BirthDate, f => f.Date.Between(DateTime.Parse("01.01.1990"), DateTime.Now));
 
                 var fakeClient = generatorClient.Generate();

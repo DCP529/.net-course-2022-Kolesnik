@@ -17,7 +17,7 @@ namespace ServicesTests
             var dictionary = dataGenerator.GenerateDictionaryClientAccount();
 
             //Act
-            var client = dictionary.FirstOrDefault(c => c.Key.Phone == 1);
+            var client = dictionary.FirstOrDefault(c => c.Key.Phone == 77500001);
             var account = dictionary[client.Key];
 
             //Asert
@@ -25,14 +25,14 @@ namespace ServicesTests
         }
 
         [Fact]
-        public void ListEmployeesTest()
+        public void ListEmployeeTest()
         {
             //Arange
             var dataGenerator = new TestDataGenerator();
             var employeeList = dataGenerator.GenerateListEmployee();
 
             //Act
-            var employee1 = employeeList.FirstOrDefault(c => c.Phone == 1);
+            var employee1 = employeeList.FirstOrDefault(c => c.Phone == 77500001);
             var employee2 = employeeList[employee1.Phone];
 
             //Asert
