@@ -6,7 +6,7 @@ namespace Models
     {
         public string Contract { get; set; }
         public decimal Salary { get; set; }
-
+        
         public override bool Equals(object obj)
         {
             if (obj is null)

@@ -81,7 +81,7 @@ namespace Tools
             stopwatch.Start();
 
             var firstOrDefount = clientsDictionary.FirstOrDefault(c => c.Key == clientsDictionary.Count - 1);
-
+            
             stopwatch.Stop();
 
             Console.WriteLine("Имя последнего клиента коллекции = " + firstOrDefount.Value.FirstName
