@@ -23,7 +23,7 @@ namespace ServicesTests
         };
 
         [Fact]
-        public void Employee_throw_AgeLimitException() 
+        public void Employee_throw_AgeLimitExceptionTest() 
         {
             //Arrange
 
@@ -41,7 +41,7 @@ namespace ServicesTests
         }
 
         [Fact]
-        public void Employee_throw_PassportNullException()
+        public void Employee_throw_PassportNullExceptionTest()
         {
             //Arrange
 

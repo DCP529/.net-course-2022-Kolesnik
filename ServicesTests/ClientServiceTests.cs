@@ -25,7 +25,13 @@ namespace ServicesTests
         {
             //Arrange
 
-            ClientService clientService = new ClientService();            
+            ClientService clientService = new ClientService();
+
+            var client = new Client()
+            {
+                BirthDate = DateTime.Parse("01.01.2005"),
+                Passport = 2
+            };
 
             //Act/Assert
 
