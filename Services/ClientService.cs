@@ -8,9 +8,9 @@ namespace Services
 {
     public class ClientService
     {
-        private Dictionary<Client, List<Account>> _clients;
+        private Dictionary<Client, List<Account>> _clients = new Dictionary<Client, List<Account>>();
 
-        public void AddClient(Client client, params Account[] accounts)
+        public void AddClient(Client client)
         {
             try
             {
@@ -24,34 +24,26 @@ namespace Services
                     throw new PassportNullException("Нельзя добавить клиента без паспортных данных!");
                 }
 
-                var accountsList = new List<Account>();
-
-                for (int i = 0; i < accounts.Length; i++)
+                var accountList = new List<Account> { new Account()
                 {
-                    accountsList.Add(accounts[i]);
-                }
+                    Currency = new Currency() { Code = 1, Name = "USD" },
+                    Amount = 1500 }
+                };
 
-                _clients.Add(client, accountsList);
+                _clients.Add(client, accountList);
             }
-            catch (AgeLimitException ex)
+            catch (AgeLimitException)
             {
-                Console.WriteLine(ex.Message);
-
                 throw;
             }
-            catch (PassportNullException ex)
+            catch (PassportNullException)
             {
-                Console.WriteLine(ex.Message);
-
                 throw;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex.Message);
-
                 throw;
             }
-
         }
     }
 }

@@ -30,18 +30,6 @@ namespace Models
                 && Salary == result.Salary;
         }
 
-        public override int GetHashCode()
-        {
-            return FirstName.GetHashCode()
-                + LastName.GetHashCode()
-                + Patronymic.GetHashCode()
-                + Passport.GetHashCode()
-                + Phone.GetHashCode()
-                + BirthDate.GetHashCode()
-                + Contract.GetHashCode()
-                + Salary.GetHashCode();
-        }
-
         public static bool operator ==(Employee firstEmployee, Employee secondEmployee)
         {
             return firstEmployee.Equals(secondEmployee);

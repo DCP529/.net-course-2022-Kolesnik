@@ -10,16 +10,6 @@ namespace ServicesTests
 {
     public class ClientServiceTests
     {
-        private Client _client = new Client()
-        {
-            BirthDate = DateTime.Parse("01.01.2005"),
-            Passport = 2,
-            Patronymic = "Hendrics",
-            Phone = 111,
-            FirstName = "Bob",
-            LastName = "Carl"
-        };
-
         [Fact]
         public void Client_throw_AgeLimitExceptionTest()
         {
@@ -35,13 +25,7 @@ namespace ServicesTests
 
             //Act/Assert
 
-            Assert.Throws<AgeLimitException>(() => clientService.AddClient
-            (
-                _client,
-                new Account() { Amount = 15 },
-                new Account() { Amount = 12 }
-                )
-            );
+            Assert.Throws<AgeLimitException>(() => clientService.AddClient(client));
         }
 
         [Fact]
@@ -51,19 +35,15 @@ namespace ServicesTests
 
             ClientService clientService = new ClientService();
 
-            _client.BirthDate = DateTime.Parse("01.01.2004");
-            _client.Passport = 0;
+            var client = new Client()
+            {
+                BirthDate = DateTime.Parse("01.01.2004"),
+                Passport = 0
+            };
 
             //Act/Assert
 
-            Assert.Throws<PassportNullException>(() => clientService.AddClient
-            (
-                _client,
-                new Account() { Amount = 10 },
-                new Account() { Amount = 1 },
-                new Account() { Amount = 20 }
-                )
-            );
+            Assert.Throws<PassportNullException>(() => clientService.AddClient(client));
         }
     }
 }

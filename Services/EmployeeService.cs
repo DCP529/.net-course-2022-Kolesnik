@@ -8,9 +8,9 @@ namespace Services
 {
     public class EmployeeService
     {
-        private Dictionary<Employee, List<Account>> _employees;
+        private List<Employee> _employees;
 
-        public void AddEmployee(Employee employee, params Account[] accounts)
+        public void AddEmployee(Employee employee)
         {
             try
             {
@@ -24,32 +24,19 @@ namespace Services
                     throw new PassportNullException("Нельзя добавить клиента без паспортных данных!");
                 }
 
-                var accountsList = new List<Account>();
-
-                for (int i = 0; i < accounts.Length; i++)
-                {
-                    accountsList.Add(accounts[i]);
-                }
-
-                _employees.Add(employee, accountsList);
+                _employees.Add(employee);
 
             }
-            catch (AgeLimitException ex)
+            catch (AgeLimitException)
             {
-                Console.WriteLine(ex.Message);
-
                 throw;
             }
-            catch (PassportNullException passportEx)
+            catch (PassportNullException)
             {
-                Console.WriteLine(passportEx.Message);
-
                 throw;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
-
                 throw;
             }
 

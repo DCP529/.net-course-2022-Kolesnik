@@ -10,20 +10,8 @@ namespace ServicesTests
 {
     public class EmployeeServiceTests
     {
-        private Employee _employee = new Employee()
-        {
-            BirthDate = DateTime.Parse("01.01.2005"),
-            Passport = 2,
-            Patronymic = "Jane",
-            Phone = 111,
-            FirstName = "Marry",
-            LastName = "Watson",
-            Contract = "",
-            Salary = 1500
-        };
-
         [Fact]
-        public void Employee_throw_AgeLimitExceptionTest() 
+        public void Employee_throw_AgeLimitException()
         {
             //Arrange
 
@@ -37,16 +25,11 @@ namespace ServicesTests
 
             //Act/Assert
 
-            Assert.Throws<AgeLimitException>(() => employeeService.AddEmployee(
-                employee,
-                new Account() { Amount = 10 },
-                new Account() { Amount = 1 },
-                new Account() { Amount = 20 }
-                ));
+            Assert.Throws<AgeLimitException>(() => employeeService.AddEmployee(employee));
         }
 
         [Fact]
-        public void Employee_throw_PassportNullExceptionTest()
+        public void Employee_throw_PassportNullException()
         {
             //Arrange
 
@@ -54,16 +37,13 @@ namespace ServicesTests
 
             var employee = new Employee()
             {
-                BirthDate = DateTime.Parse("01.01.2004")
+                BirthDate = DateTime.Parse("01.01.2004"),
+                Passport = 0
             };
 
             //Act/Assert
 
-            Assert.Throws<PassportNullException>(() => employeeService.AddEmployee(
-                employee,
-                new Account() { Amount = 10 },
-                new Account() { Amount = 1 },
-                new Account() { Amount = 20 }));
+            Assert.Throws<PassportNullException>(() => employeeService.AddEmployee(employee));
         }
     }
 }

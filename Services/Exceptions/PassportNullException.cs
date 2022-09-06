@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Services.Exceptions
 {
-    public class PassportNullException : ArgumentNullException
+    public class PassportNullException : Exception
     {
         public PassportNullException(string message) : base(message) { }
     }
