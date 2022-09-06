@@ -37,7 +37,12 @@ namespace ServicesTests
 
             //Act/Assert
 
-            Assert.Throws<AgeLimitException>(() => employeeService.AddEmployee(employee));
+            Assert.Throws<AgeLimitException>(() => employeeService.AddEmployee(
+                employee,
+                new Account() { Amount = 10 },
+                new Account() { Amount = 1 },
+                new Account() { Amount = 20 }
+                ));
         }
 
         [Fact]
@@ -54,7 +59,11 @@ namespace ServicesTests
 
             //Act/Assert
 
-            Assert.Throws<PassportNullException>(() => employeeService.AddEmployee(employee));
+            Assert.Throws<PassportNullException>(() => employeeService.AddEmployee(
+                employee,
+                new Account() { Amount = 10 },
+                new Account() { Amount = 1 },
+                new Account() { Amount = 20 }));
         }
     }
 }
