@@ -45,5 +45,31 @@ namespace ServicesTests
 
             Assert.Throws<PassportNullException>(() => clientService.AddClient(client));
         }
+
+        [Fact]
+        public void Add_2_Idential_ClientExceptionTest()
+        {
+            //Arrange
+
+            ClientService clientService = new ClientService();
+
+            var client1 = new Client()
+            {
+                BirthDate = DateTime.Parse("01.01.2004"),
+                Passport = 1,
+                FirstName = "",
+                LastName = "",
+                Patronymic = "",
+                Phone = 77838196
+            };
+
+            //Act
+
+            clientService.AddClient(client1);
+
+            //Assert
+
+            Assert.Throws<ArgumentException>(() => clientService.AddClient(client1));
+        }
     }
 }
