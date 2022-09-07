@@ -1,8 +1,10 @@
 ﻿using Models;
 using Services;
 using Services.Exceptions;
+using Services.Filters;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Xunit;
 
@@ -15,7 +17,7 @@ namespace ServicesTests
         {
             //Arrange
 
-            EmployeeService employeeService = new EmployeeService();
+            EmployeeService employeeService = new EmployeeService(new EmployeeStorage());
 
             var employee = new Employee()
             {
@@ -33,7 +35,7 @@ namespace ServicesTests
         {
             //Arrange
 
-            EmployeeService employeeService = new EmployeeService();
+            EmployeeService employeeService = new EmployeeService(new EmployeeStorage());
 
             var employee = new Employee()
             {
@@ -44,6 +46,67 @@ namespace ServicesTests
             //Act/Assert
 
             Assert.Throws<PassportNullException>(() => employeeService.AddEmployee(employee));
+        }
+
+        [Fact]
+        public void Get_Employees_QueryTests()
+        {
+            //Arange
+
+            EmployeeService employeeService = new EmployeeService(new EmployeeStorage());
+
+            var employee1 = new Employee()
+            {
+                BirthDate = DateTime.Parse("01.01.2003"),
+                FirstName = "Сергей",
+                LastName = "Сидоров",
+                Passport = 1,
+                Patronymic = "Игоревич",
+                Phone = 1,
+            };
+
+            var employee2 = new Employee()
+            {
+                BirthDate = DateTime.Parse("01.01.1987"),
+                FirstName = "Сергей",
+                LastName = "Сидоров",
+                Passport = 1,
+                Patronymic = "Игоревич",
+                Phone = 1,
+            };
+
+            var employee3 = new Employee()
+            {
+                BirthDate = DateTime.Parse("01.01.1997"),
+                FirstName = "Сергей",
+                LastName = "Сидоров",
+                Passport = 1,
+                Patronymic = "Игоревич",
+                Phone = 1,
+            };
+
+            //Act
+
+            employeeService.AddEmployee(employee1);
+            employeeService.AddEmployee(employee2);
+            employeeService.AddEmployee(employee3);
+
+
+            var employeesDictionary = employeeService.GetEmployees(new EmployeeFilter()
+            {
+                BirthDayRange = new Tuple<DateTime, DateTime>(DateTime.Parse("01.01.1922"), DateTime.Parse("31.12.2004"))
+            });
+
+            var young = employeesDictionary.Max(x => x.BirthDate);
+
+            var old = employeesDictionary.Min(x => x.BirthDate);
+
+            var averageAge = new DateTime((long)employeesDictionary.Average(x => x.BirthDate.Ticks));
+
+            //Assert
+            Assert.Equal(young, employee1.BirthDate);
+            Assert.Equal(old, employee2.BirthDate);
+            Assert.Equal(averageAge.Year, 1995);
         }
     }
 }
