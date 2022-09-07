@@ -2,17 +2,18 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Models
+namespace Services.Filters
 {
-    public class Person
+    public class EmployeeFilter
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Patronymic { get; set; }
-        public int Passport { get; set; }
         public int Phone { get; set; }
-        public DateTime BirthDate { get; set; }
+        public int Passport { get; set; }
+        public string Contract { get; set; }
+        public decimal Salary { get; set; }
 
-        public int Bonus { get; set; }
+        public Tuple<DateTime, DateTime> BirthDayRange { get; set; }
     }
 }
