@@ -12,34 +12,17 @@ namespace Services
 
         public void AddEmployee(Employee employee)
         {
-            try
+            if (employee.BirthDate > DateTime.Parse("31.12.2004"))
             {
-                if (employee.BirthDate > DateTime.Parse("31.12.2004"))
-                {
-                    throw new AgeLimitException("Возраст клиента должен быть больше 18!");
-                }
-
-                if (employee.Passport == 0)
-                {
-                    throw new PassportNullException("Нельзя добавить клиента без паспортных данных!");
-                }
-
-                _employees.Add(employee);
-
-            }
-            catch (AgeLimitException)
-            {
-                throw;
-            }
-            catch (PassportNullException)
-            {
-                throw;
-            }
-            catch (Exception)
-            {
-                throw;
+                throw new AgeLimitException("Возраст клиента должен быть больше 18!");
             }
 
+            if (employee.Passport == 0)
+            {
+                throw new PassportNullException("Нельзя добавить клиента без паспортных данных!");
+            }
+
+            _employees.Add(employee);
         }
     }
 }
