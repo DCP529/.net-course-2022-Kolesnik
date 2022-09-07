@@ -1,14 +1,20 @@
 ﻿using Models;
 using Services.Exceptions;
+using Services.Filters;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 namespace Services
 {
-    public class ClientService
+    public class ClientService 
     {
-        private Dictionary<Client, List<Account>> _clients = new Dictionary<Client, List<Account>>();
+        private ClientStorage _clients = new ClientStorage();
+
+        public ClientService(ClientStorage clientStorage)
+        {
+            _clients = clientStorage;
+        }
 
         public void AddClient(Client client)
         {
@@ -22,9 +28,44 @@ namespace Services
                 throw new PassportNullException("Нельзя добавить клиента без паспортных данных!");
             }
 
-            var accountList = new List<Account> { new Account() { Currency = new Currency() { Code = 1, Name = "USD" } } };
+            _clients.AddClient(client);
+        }
 
-            _clients.Add(client, accountList);
+        
+
+        public Dictionary<Client, List<Account>> GetClients(ClientFilter clientFilters)
+        {
+            if (clientFilters.FirstName != null && clientFilters.LastName != null && clientFilters.Patronymic != null)
+            {
+                return _clients.clients.Where(x => x.Key.FirstName == clientFilters.FirstName)
+                .Where(x => x.Key.LastName == clientFilters.LastName)
+                .Where(x => x.Key.Patronymic == clientFilters.Patronymic).ToDictionary(t => t.Key, t => t.Value);
+            }
+
+            if (clientFilters.Passport != 0)
+            {
+                return _clients.clients.Where(x => x.Key.Passport == clientFilters.Passport).ToDictionary(t => t.Key, t => t.Value);
+            }
+
+            if (clientFilters.Phone != 0)
+            {
+                return _clients.clients.Where(x => x.Key.Phone == clientFilters.Phone).ToDictionary(t => t.Key, t => t.Value);
+            }
+
+            if (clientFilters.BirthDayRange != null)
+            {
+                return _clients.clients
+                    .Where(x => x.Key.BirthDate >= clientFilters.BirthDayRange[0] && x.Key.BirthDate <= clientFilters.BirthDayRange[1])
+                    .ToDictionary(t => t.Key, t => t.Value);
+            }
+
+            return _clients.clients.Where(x => x.Key.FirstName == clientFilters.FirstName)
+                .Where(x => x.Key.LastName == clientFilters.LastName)
+                .Where(x => x.Key.Patronymic == clientFilters.Patronymic)
+                .Where(x => x.Key.Passport == clientFilters.Passport)
+                .Where(x => x.Key.Phone == clientFilters.Phone)
+                .Where(x => x.Key.BirthDate >= clientFilters.BirthDayRange[0] && x.Key.BirthDate <= clientFilters.BirthDayRange[1])
+                .ToDictionary(t => t.Key, t => t.Value);
         }
     }
 }
