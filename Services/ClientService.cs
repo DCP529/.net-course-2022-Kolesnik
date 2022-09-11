@@ -1,4 +1,4 @@
-﻿using Models;
+﻿    using Models;
 using Services.Exceptions;
 using Services.Filters;
 using System;
@@ -31,8 +31,6 @@ namespace Services
             _clients.AddClient(client);
         }
 
-        
-
         public Dictionary<Client, List<Account>> GetClients(ClientFilter clientFilters)
         {
             IEnumerable<KeyValuePair<Client, List<Account>>> query = null;
@@ -40,8 +38,8 @@ namespace Services
             if (clientFilters.FirstName != null && clientFilters.LastName != null && clientFilters.Patronymic != null)
             {
                 query = _clients.clients.Where(x => x.Key.FirstName == clientFilters.FirstName)
-                .Where(x => x.Key.LastName == clientFilters.LastName)
-                .Where(x => x.Key.Patronymic == clientFilters.Patronymic);
+                    .Where(x => x.Key.LastName == clientFilters.LastName)
+                    .Where(x => x.Key.Patronymic == clientFilters.Patronymic);
             }
 
             if (clientFilters.Passport != 0 && query != null)
@@ -49,7 +47,7 @@ namespace Services
                 query = query.Intersect(_clients.clients.Where(x => x.Key.Passport == clientFilters.Passport)
                     .ToDictionary(t => t.Key, t => t.Value));
             }
-            else if(clientFilters.Passport != 0)
+            else if (clientFilters.Passport != 0)
             {
                 return _clients.clients.Where(x => x.Key.Passport == clientFilters.Passport)
                     .ToDictionary(t => t.Key, t => t.Value);
@@ -69,13 +67,15 @@ namespace Services
             if (clientFilters.BirthDayRange != null && query != null)
             {
                 query = query.Intersect(_clients.clients
-                    .Where(x => x.Key.BirthDate >= clientFilters.BirthDayRange.Item1 && x.Key.BirthDate <= clientFilters.BirthDayRange.Item2)
+                    .Where(x => x.Key.BirthDate >= clientFilters.BirthDayRange.Item1 &&
+                                x.Key.BirthDate <= clientFilters.BirthDayRange.Item2)
                     .ToDictionary(t => t.Key, t => t.Value));
             }
             else if (clientFilters.BirthDayRange != null)
             {
                 return _clients.clients
-                    .Where(x => x.Key.BirthDate >= clientFilters.BirthDayRange.Item1 && x.Key.BirthDate <= clientFilters.BirthDayRange.Item2)
+                    .Where(x => x.Key.BirthDate >= clientFilters.BirthDayRange.Item1 &&
+                                x.Key.BirthDate <= clientFilters.BirthDayRange.Item2)
                     .ToDictionary(t => t.Key, t => t.Value);
             }
 
@@ -83,9 +83,8 @@ namespace Services
             {
                 return query.ToDictionary(t => t.Key, t => t.Value);
             }
-            else
-            {
-                return null;
-            } }
+
+            return null;
+        }
     }
 }
