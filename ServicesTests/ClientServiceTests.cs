@@ -42,7 +42,7 @@ namespace ServicesTests
             var client3 = new Client()
             {
                 BirthDate = DateTime.Parse("01.01.1997"),
-                FirstName = "Сергей",
+                FirstName = "Сережа",
                 LastName = "Сидоров",
                 Passport = 1,
                 Patronymic = "Игоревич",
@@ -66,6 +66,14 @@ namespace ServicesTests
             var old = clientDictionary.Min(x => x.Key.BirthDate);
 
             var averageAge = new DateTime((long)clientDictionary.Average(x => x.Key.BirthDate.Ticks));
+
+            var clientFIOAndBirthDate = clientService.GetClients(new ClientFilter()
+            {
+                FirstName = "Сережа",
+                LastName = "Сидоров",
+                Patronymic = "Игоревич",
+                BirthDayRange = new Tuple<DateTime, DateTime>(DateTime.Parse("01.01.1922"), DateTime.Parse("31.12.2004"))
+            });
 
             //Assert
             Assert.Equal(young, client1.BirthDate);
