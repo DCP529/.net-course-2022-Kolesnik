@@ -1,4 +1,4 @@
-﻿    using Models;
+﻿using Models;
 using Services.Exceptions;
 using Services.Filters;
 using System;
@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Services
 {
-    public class ClientService 
+    public class ClientService
     {
         private ClientStorage _clients = new ClientStorage();
 
@@ -33,55 +33,33 @@ namespace Services
 
         public Dictionary<Client, List<Account>> GetClients(ClientFilter clientFilters)
         {
-            IEnumerable<KeyValuePair<Client, List<Account>>> query = null;
+            IEnumerable<KeyValuePair<Client, List<Account>>> query = _clients.clients.Select(t => t);
 
             if (clientFilters.FirstName != null && clientFilters.LastName != null && clientFilters.Patronymic != null)
             {
-                query = _clients.clients.Where(x => x.Key.FirstName == clientFilters.FirstName)
+                query.Where(x => x.Key.FirstName == clientFilters.FirstName)
                     .Where(x => x.Key.LastName == clientFilters.LastName)
                     .Where(x => x.Key.Patronymic == clientFilters.Patronymic);
             }
 
-            if (clientFilters.Passport != 0 && query != null)
+            if (clientFilters.Passport != 0)
             {
-                query = query.Intersect(_clients.clients.Where(x => x.Key.Passport == clientFilters.Passport));
-            }
-            else if (clientFilters.Passport != 0)
-            {
-                return _clients.clients.Where(x => x.Key.Passport == clientFilters.Passport)
-                    .ToDictionary(t => t.Key, t => t.Value);
+                query = query.Where(x => x.Key.Passport == clientFilters.Passport);
             }
 
-            if (clientFilters.Phone != 0 && query != null)
+            if (clientFilters.Phone != 0)
             {
-                query = query.Intersect(_clients.clients.Where(x => x.Key.Phone == clientFilters.Phone));
-            }
-            else if (clientFilters.Phone != 0)
-            {
-                return _clients.clients.Where(x => x.Key.Phone == clientFilters.Phone)
-                    .ToDictionary(t => t.Key, t => t.Value);
+                query.Where(x => x.Key.Phone == clientFilters.Phone);
             }
 
-            if (clientFilters.BirthDayRange != null && query != null)
+            if (clientFilters.BirthDayRange != null)
             {
-                query = query.Intersect(_clients.clients
-                    .Where(x => x.Key.BirthDate >= clientFilters.BirthDayRange.Item1 &&
-                                x.Key.BirthDate <= clientFilters.BirthDayRange.Item2));
-            }
-            else if (clientFilters.BirthDayRange != null)
-            {
-                return _clients.clients
-                    .Where(x => x.Key.BirthDate >= clientFilters.BirthDayRange.Item1 &&
-                                x.Key.BirthDate <= clientFilters.BirthDayRange.Item2)
-                    .ToDictionary(t => t.Key, t => t.Value);
+                query.Where(x => x.Key.BirthDate >= clientFilters.BirthDayRange.Item1 &&
+                                 x.Key.BirthDate <= clientFilters.BirthDayRange.Item2);
             }
 
-            if (query != null)
-            {
-                return query.ToDictionary(t => t.Key, t => t.Value);
-            }
+            return query.ToDictionary(t => t.Key, t => t.Value);
 
-            return null;
         }
     }
 }
