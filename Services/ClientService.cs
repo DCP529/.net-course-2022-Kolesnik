@@ -44,8 +44,7 @@ namespace Services
 
             if (clientFilters.Passport != 0 && query != null)
             {
-                query = query.Intersect(_clients.clients.Where(x => x.Key.Passport == clientFilters.Passport)
-                    .ToDictionary(t => t.Key, t => t.Value));
+                query = query.Intersect(_clients.clients.Where(x => x.Key.Passport == clientFilters.Passport));
             }
             else if (clientFilters.Passport != 0)
             {
@@ -55,8 +54,7 @@ namespace Services
 
             if (clientFilters.Phone != 0 && query != null)
             {
-                query = query.Intersect(_clients.clients.Where(x => x.Key.Phone == clientFilters.Phone)
-                    .ToDictionary(t => t.Key, t => t.Value));
+                query = query.Intersect(_clients.clients.Where(x => x.Key.Phone == clientFilters.Phone));
             }
             else if (clientFilters.Phone != 0)
             {
@@ -68,8 +66,7 @@ namespace Services
             {
                 query = query.Intersect(_clients.clients
                     .Where(x => x.Key.BirthDate >= clientFilters.BirthDayRange.Item1 &&
-                                x.Key.BirthDate <= clientFilters.BirthDayRange.Item2)
-                    .ToDictionary(t => t.Key, t => t.Value));
+                                x.Key.BirthDate <= clientFilters.BirthDayRange.Item2));
             }
             else if (clientFilters.BirthDayRange != null)
             {
