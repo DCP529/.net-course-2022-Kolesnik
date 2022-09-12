@@ -1,25 +1,96 @@
 ﻿using Models;
 using Services;
 using Services.Exceptions;
+using Services.Filters;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using Xunit;
+using System.Linq;
 
 namespace ServicesTests
 {
     public class ClientServiceTests
     {
         [Fact]
+        public void Get_Clients_QueryTests()
+        {
+            //Arange
+
+            ClientService clientService = new ClientService(new ClientStorage());
+
+            var client1 = new Client()
+            {
+                BirthDate = DateTime.Parse("01.01.2003"),
+                FirstName = "Сергей",
+                LastName = "Сидоров",
+                Passport = 1,
+                Patronymic = "Игоревич",
+                Phone = 1,
+            };
+
+            var client2 = new Client()
+            {
+                BirthDate = DateTime.Parse("01.01.1987"),
+                FirstName = "Сергей",
+                LastName = "Сидоров",
+                Passport = 1,
+                Patronymic = "Игоревич",
+                Phone = 1,
+            };
+
+            var client3 = new Client()
+            {
+                BirthDate = DateTime.Parse("01.01.1997"),
+                FirstName = "Сережа",
+                LastName = "Сидоров",
+                Passport = 1,
+                Patronymic = "Игоревич",
+                Phone = 1,
+            };
+
+            //Act
+
+            clientService.AddClient(client1);
+            clientService.AddClient(client2);
+            clientService.AddClient(client3);
+
+
+            var clientDictionary = clientService.GetClients(new ClientFilter()
+            {
+                BirthDayRange = new Tuple<DateTime, DateTime>(DateTime.Parse("01.01.1922"), DateTime.Parse("31.12.2004"))
+            });
+
+            var young = clientDictionary.Max(x => x.Key.BirthDate);
+
+            var old = clientDictionary.Min(x => x.Key.BirthDate);
+
+            var averageAge = new DateTime((long)clientDictionary.Average(x => x.Key.BirthDate.Ticks));
+
+            var clientFIOAndBirthDate = clientService.GetClients(new ClientFilter()
+            {
+                FirstName = "Сережа",
+                LastName = "Сидоров",
+                Patronymic = "Игоревич",
+                BirthDayRange = new Tuple<DateTime, DateTime>(DateTime.Parse("01.01.1922"), DateTime.Parse("31.12.2004"))
+            });
+
+            //Assert
+            Assert.Equal(young, client1.BirthDate);
+            Assert.Equal(old, client2.BirthDate);
+            Assert.Equal(averageAge.Year, 1995);
+        }
+
+        [Fact]
         public void Client_throw_AgeLimitExceptionTest()
         {
             //Arrange
 
-            ClientService clientService = new ClientService();
+            ClientService clientService = new ClientService(new ClientStorage());
 
             var client = new Client()
             {
-                BirthDate = DateTime.Parse("01.01.2005"),
+                BirthDate = DateTime.Parse("01.01.205"),
                 Passport = 2
             };
 
@@ -33,7 +104,7 @@ namespace ServicesTests
         {
             //Arrange
 
-            ClientService clientService = new ClientService();
+            ClientService clientService = new ClientService(new ClientStorage());
 
             var client = new Client()
             {
@@ -51,7 +122,7 @@ namespace ServicesTests
         {
             //Arrange
 
-            ClientService clientService = new ClientService();
+            ClientService clientService = new ClientService(new ClientStorage());
 
             var client1 = new Client()
             {
