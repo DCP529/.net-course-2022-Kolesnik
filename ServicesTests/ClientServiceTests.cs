@@ -34,7 +34,7 @@ namespace ServicesTests
                 BirthDate = DateTime.Parse("01.01.1987"),
                 FirstName = "Сергей",
                 LastName = "Сидоров",
-                Passport = 1,
+                Passport = 2,
                 Patronymic = "Игоревич",
                 Phone = 1,
             };
@@ -69,9 +69,10 @@ namespace ServicesTests
 
             var clientFIOAndBirthDate = clientService.GetClients(new ClientFilter()
             {
-                FirstName = "Сережа",
+                FirstName = "Сергей",
                 LastName = "Сидоров",
                 Patronymic = "Игоревич",
+                Passport = 2,
                 BirthDayRange = new Tuple<DateTime, DateTime>(DateTime.Parse("01.01.1922"), DateTime.Parse("31.12.2004"))
             });
 
