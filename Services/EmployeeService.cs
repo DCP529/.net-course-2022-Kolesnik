@@ -34,52 +34,31 @@ namespace Services
 
         public List<Employee> GetEmployees(EmployeeFilter employeeFilter)
         {
-            IEnumerable<Employee> query = null;
+            IEnumerable<Employee> query = _employees.employees.Select(t => t);
 
             if (employeeFilter.FirstName != null && employeeFilter.LastName != null && employeeFilter.Patronymic != null)
             {
-                query = _employees.employees.Where(x => x.FirstName == employeeFilter.FirstName)
+                query.Where(x => x.FirstName == employeeFilter.FirstName)
                 .Where(x => x.LastName == employeeFilter.LastName)
                 .Where(x => x.Patronymic == employeeFilter.Patronymic);
             }
 
-            if (employeeFilter.Passport != 0 && query != null)
+            if (employeeFilter.Passport != 0)
             {
-                return _employees.employees.Where(x => x.Passport == employeeFilter.Passport).ToList();
-            }
-            else if (employeeFilter.Passport != 0)
-            {
-                query = query.Intersect(_employees.employees.Where(x => x.Passport == employeeFilter.Passport));
+                query.Where(x => x.Passport == employeeFilter.Passport);
             }
 
-            if (employeeFilter.Phone != 0 && query != null)
+            if (employeeFilter.Phone != 0)
             {
-                return _employees.employees.Where(x => x.Phone == employeeFilter.Phone).ToList();
-            }
-            else if (employeeFilter.Phone != 0)
-            {
-                query = query.Intersect(_employees.employees.Where(x => x.Phone == employeeFilter.Phone));
+                query.Where(x => x.Phone == employeeFilter.Phone);
             }
 
-            if (employeeFilter.BirthDayRange != null && query != null)
+            if (employeeFilter.BirthDayRange != null)
             {
-                return _employees.employees
-                    .Where(x => x.BirthDate >= employeeFilter.BirthDayRange.Item1 && x.BirthDate <= employeeFilter.BirthDayRange.Item2).ToList();
-            }
-            else if (employeeFilter.BirthDayRange != null)
-            {
-                query = query.Intersect(_employees.employees
-                    .Where(x => x.BirthDate >= employeeFilter.BirthDayRange.Item1 && x.BirthDate <= employeeFilter.BirthDayRange.Item2));
+                query.Where(x => x.BirthDate >= employeeFilter.BirthDayRange.Item1 && x.BirthDate <= employeeFilter.BirthDayRange.Item2);
             }
 
-            if (query != null)
-            {
-                return query.ToList();
-            }
-            else
-            {
-                return null;
-            }
+            return query.ToList();
         }
     }
 }
