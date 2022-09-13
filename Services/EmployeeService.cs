@@ -30,17 +30,34 @@ namespace Services
                 throw new PassportNullException("Нельзя добавить клиента без паспортных данных!");
             }
 
-            _employees.Add(employee);
+            if (!_employees.Data.Contains(employee))
+            {
+                _employees.Add(employee);
+            }
         }
 
         public void Update(Employee employee)
         {
+            IsEmployeeInDictionary(employee);
+
             _employees.Update(employee);
         }
 
         public void Delete(Employee employee)
         {
+            IsEmployeeInDictionary(employee);
+
             _employees.Delete(employee);
+        }
+
+        private void IsEmployeeInDictionary(Employee employee)
+        {
+            var findEmployee = _employees.Data.FirstOrDefault(x => x.Passport == employee.Passport);
+
+            if (!_employees.Data.Contains(findEmployee))
+            {
+                throw new ArgumentException("Сотрудник не найден!");
+            }
         }
 
         public List<Employee> GetEmployees(EmployeeFilter employeeFilter)

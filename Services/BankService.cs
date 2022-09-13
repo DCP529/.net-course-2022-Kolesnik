@@ -31,7 +31,7 @@ namespace Services
 
         public void AddBonus(Person person)
         {
-            person.Bonus = 1;
+            person.Bonus += 1;
         }
 
         public void AddToBlackList<T>(T person) where T : Person

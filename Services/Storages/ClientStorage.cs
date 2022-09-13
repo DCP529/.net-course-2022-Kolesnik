@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using Services.Storage;
 
 namespace Services
@@ -54,9 +55,7 @@ namespace Services
             var result = Data.FirstOrDefault(x => x.Value
                 .Find(x => x.Currency.Code == account.Currency.Code).Currency.Code == account.Currency.Code);
 
-            Data[item].Remove(result.Value[0]);
-            
-            AddAccount(item, account);
+            result.Value[1] = account;
         }
 
         public void DeleteAccount(Client item, Account account)

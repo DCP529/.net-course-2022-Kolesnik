@@ -107,10 +107,10 @@ namespace ServicesTests
             clientService.Update(client2);
 
             var updateClient = clientService.GetClients(new ClientFilter() { Passport = client1.Passport })
-                .FirstOrDefault(x => x.Key.Passport == client1.Passport);
+                .FirstOrDefault(x => x.Key.Passport == client1.Passport).Key;
 
             //Assert
-            Assert.Equal(client1.Passport, updateClient.Key.Passport);
+            Assert.Equal(client1.Passport, updateClient.Passport);
         }
 
         [Fact]
@@ -292,17 +292,18 @@ namespace ServicesTests
 
             //Act
 
+            clientService.AddClient(client);
             clientService.AddAccount(client, account1);
             clientService.UpdateAccount(client, account2);
 
             var getClient = clientService.GetClients(new ClientFilter() { Passport = client.Passport })
                 .FirstOrDefault(x => x.Key.Passport == client.Passport);
 
-            var updateAccount = getClient.Value.Find(x => x.Currency.Code == account1.Currency.Code);
+            var updateAccount = getClient.Value.Find(x => x.Currency.Code == account2.Currency.Code);
 
             //Assert
 
-            Assert.Equal(account1.Currency.Code, updateAccount.Currency.Code);
+            Assert.Equal(account2.Currency.Code, updateAccount.Currency.Code);
         }
 
         [Fact]
@@ -333,6 +334,7 @@ namespace ServicesTests
 
             //Act
 
+            clientService.AddClient(client);
             clientService.AddAccount(client, account);
             clientService.DeleteAccount(client, account);
 
@@ -341,7 +343,7 @@ namespace ServicesTests
 
             //Assert
 
-            Assert.Equal(getClient.Value.Count, 0);
+            Assert.Equal(getClient.Value.Count, 1);
         }
     }
 }

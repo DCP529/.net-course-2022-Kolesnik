@@ -3,6 +3,7 @@ using Services.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Services.Storage;
 using Services.Filters;
@@ -29,9 +30,10 @@ namespace Services
                 throw new PassportNullException("Нельзя добавить клиента без паспортных данных!");
             }
 
-            var accountList = new List<Account> { new Account() { Currency = new Currency() { Code = 1, Name = "USD" } } };
-
-            _clients.Add(client);
+            if (!_clients.Data.ContainsKey(client))
+            {
+                _clients.Add(client);
+            }
         }
 
         public Dictionary<Client, List<Account>> GetClients(ClientFilter clientFilters)
@@ -66,27 +68,64 @@ namespace Services
 
         public void Update(Client client)
         {
+            IsClientInDictionary(client);
+
             _clients.Update(client);
         }
 
         public void Delete(Client client)
         {
+            IsClientInDictionary(client);
+
             _clients.Delete(client);
         }
 
         public void AddAccount(Client client, Account account)
         {
-            _clients.AddAccount(client, account);
+            IsClientInDictionary(client);
+
+            if (!_clients.Data[client].Contains(account))
+            {
+                _clients.AddAccount(client, account);
+            }
         }
 
-        public void UpdateAccount(Client client, Account account)
+        public void UpdateAccount(Client client, Account account) 
         {
+            IsClientInDictionary(client);
+
+            IsAccountInDictionary(client, account);
+
             _clients.UpdateAccount(client, account);
         }
 
         public void DeleteAccount(Client client, Account account)
         {
+            IsClientInDictionary(client);
+
+            IsAccountInDictionary(client, account);
+
             _clients.DeleteAccount(client, account);
+        }
+
+        private void IsClientInDictionary(Client client)
+        {
+            var findClient = _clients.Data.FirstOrDefault(x => x.Key.Passport == client.Passport).Key;
+
+            if (!_clients.Data.ContainsKey(findClient))
+            {
+                throw new ArgumentException("Клиент не найден!");
+            }
+        }
+
+        private void IsAccountInDictionary(Client client, Account account)
+        {
+            var findAccount = _clients.Data[client].FirstOrDefault(x => x.Currency.Code == account.Currency.Code);
+
+            if (!_clients.Data[client].Contains(findAccount))
+            {
+                throw new ArgumentException("Аккаунт не найден!");
+            }
         }
     }
 }
