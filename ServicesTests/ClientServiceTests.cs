@@ -1,4 +1,4 @@
-﻿using Models;
+using Models;
 using Services;
 using Services.Exceptions;
 using System;
@@ -345,3 +345,4 @@ namespace ServicesTests
         }
     }
 }
+
