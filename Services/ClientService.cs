@@ -1,4 +1,4 @@
-﻿using Models;
+using Models;
 using Services.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ namespace Services
 {
     public class ClientService
     {
-        private IClientStorage _clients = new ClientStorage();
+        private IClientStorage _clients;
 
         public ClientService(IClientStorage clientStorage)
         {

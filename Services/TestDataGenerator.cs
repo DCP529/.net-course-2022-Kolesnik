@@ -22,7 +22,7 @@ namespace Services
     .RuleFor(x => x.Patronymic, f => "")
     .RuleFor(x => x.Passport, f => f.Random.Int(1, 500))
     .RuleFor(x => x.Phone, f => 77500000 + i)
-    .RuleFor(x => x.BirthDate, f => f.Date.Between(DateTime.Parse("01.01.1990"), DateTime.Now));
+    .RuleFor(x => x.BirthDate, f => f.Date.Between(DateTime.Parse("01.01.1950"), DateTime.Parse("01.01.2004")));
 
             for (i = 0; i <= 999; i++)
             {
@@ -47,7 +47,7 @@ namespace Services
     .RuleFor(x => x.Phone, f => 77500000 + i)
     .RuleFor(x => x.Salary, f => f.Random.Decimal(1_000, 100_000))
     .RuleFor(x => x.Contract, f => "")
-    .RuleFor(x => x.BirthDate, f => f.Date.Between(DateTime.Parse("01.01.1990"), DateTime.Now));
+    .RuleFor(x => x.BirthDate, f => f.Date.Between(DateTime.Parse("01.01.1950"), DateTime.Parse("01.01.2004")));
 
             for ( i = 0; i <= 999; i++)
             {
