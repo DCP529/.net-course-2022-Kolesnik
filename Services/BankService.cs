@@ -7,7 +7,7 @@ namespace Services
 {
     public class BankService
     {
-        private List<Person> BlackList { get; set; }
+        private List<Person> BlackList = new List<Person>();
 
         public decimal Payroll(decimal bankProfit, decimal expenses, params Employee[] owners)
         {
