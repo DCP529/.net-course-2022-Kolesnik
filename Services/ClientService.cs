@@ -1,21 +1,23 @@
-﻿using Models;
+using Models;
 using Services.Exceptions;
-using Services.Filters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text;
+using Services.Storage;
+using Services.Filters;
 
 namespace Services
 {
     public class ClientService
     {
-        private ClientStorage _clients = new ClientStorage();
+        private IClientStorage _clients;
 
-        public ClientService(ClientStorage clientStorage)
+        public ClientService(IClientStorage clientStorage)
         {
             _clients = clientStorage;
         }
-
         public void AddClient(Client client)
         {
             if (client.BirthDate > DateTime.Parse("31.12.2004"))
@@ -28,12 +30,15 @@ namespace Services
                 throw new PassportNullException("Нельзя добавить клиента без паспортных данных!");
             }
 
-            _clients.AddClient(client);
+            if (!_clients.Data.ContainsKey(client))
+            {
+                _clients.Add(client);
+            }
         }
 
         public Dictionary<Client, List<Account>> GetClients(ClientFilter clientFilters)
         {
-            IEnumerable<KeyValuePair<Client, List<Account>>> query = _clients.clients.Select(t => t);
+            IEnumerable<KeyValuePair<Client, List<Account>>> query = _clients.Data.Select(t => t);
 
             if (clientFilters.FirstName != null && clientFilters.LastName != null && clientFilters.Patronymic != null)
             {
@@ -59,7 +64,68 @@ namespace Services
             }
 
             return query.ToDictionary(t => t.Key, t => t.Value);
+        }
 
+        public void Update(Client client)
+        {
+            IsClientInDictionary(client);
+
+            _clients.Update(client);
+        }
+
+        public void Delete(Client client)
+        {
+            IsClientInDictionary(client);
+
+            _clients.Delete(client);
+        }
+
+        public void AddAccount(Client client, Account account)
+        {
+            IsClientInDictionary(client);
+
+            if (!_clients.Data[client].Contains(account))
+            {
+                _clients.AddAccount(client, account);
+            }
+        }
+
+        public void UpdateAccount(Client client, Account account) 
+        {
+            IsClientInDictionary(client);
+
+            IsAccountInDictionary(client, account);
+
+            _clients.UpdateAccount(client, account);
+        }
+
+        public void DeleteAccount(Client client, Account account)
+        {
+            IsClientInDictionary(client);
+
+            IsAccountInDictionary(client, account);
+
+            _clients.DeleteAccount(client, account);
+        }
+
+        private void IsClientInDictionary(Client client)
+        {
+            var findClient = _clients.Data.FirstOrDefault(x => x.Key.Passport == client.Passport).Key;
+
+            if (!_clients.Data.ContainsKey(findClient))
+            {
+                throw new ArgumentException("Клиент не найден!");
+            }
+        }
+
+        private void IsAccountInDictionary(Client client, Account account)
+        {
+            var findAccount = _clients.Data[client].FirstOrDefault(x => x.Currency.Code == account.Currency.Code);
+
+            if (!_clients.Data[client].Contains(findAccount))
+            {
+                throw new ArgumentException("Аккаунт не найден!");
+            }
         }
     }
 }

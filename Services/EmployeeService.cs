@@ -1,20 +1,21 @@
-﻿using Models;
+using Models;
 using Services.Exceptions;
-using Services.Filters;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
+using System.Text;
+using Services.Filters;
+using Services.Storage;
 
 namespace Services
 {
     public class EmployeeService
     {
-        private EmployeeStorage _employees;
+        private IEmployeeStorage _employees = new EmployeeStorage();
 
-        public EmployeeService(EmployeeStorage employee)
+        public EmployeeService(IEmployeeStorage employeeStorage)
         {
-            _employees = employee;
+            _employees = employeeStorage;
         }
 
         public void AddEmployee(Employee employee)
@@ -29,18 +30,45 @@ namespace Services
                 throw new PassportNullException("Нельзя добавить клиента без паспортных данных!");
             }
 
-            _employees.Add(employee);
+            if (!_employees.Data.Contains(employee))
+            {
+                _employees.Add(employee);
+            }
+        }
+
+        public void Update(Employee employee)
+        {
+            IsEmployeeInDictionary(employee);
+
+            _employees.Update(employee);
+        }
+
+        public void Delete(Employee employee)
+        {
+            IsEmployeeInDictionary(employee);
+
+            _employees.Delete(employee);
+        }
+
+        private void IsEmployeeInDictionary(Employee employee)
+        {
+            var findEmployee = _employees.Data.FirstOrDefault(x => x.Passport == employee.Passport);
+
+            if (!_employees.Data.Contains(findEmployee))
+            {
+                throw new ArgumentException("Сотрудник не найден!");
+            }
         }
 
         public List<Employee> GetEmployees(EmployeeFilter employeeFilter)
         {
-            IEnumerable<Employee> query = _employees.employees.Select(t => t);
+            IEnumerable<Employee> query = _employees.Data.Select(t => t);
 
             if (employeeFilter.FirstName != null && employeeFilter.LastName != null && employeeFilter.Patronymic != null)
             {
                 query.Where(x => x.FirstName == employeeFilter.FirstName)
-                .Where(x => x.LastName == employeeFilter.LastName)
-                .Where(x => x.Patronymic == employeeFilter.Patronymic);
+                    .Where(x => x.LastName == employeeFilter.LastName)
+                    .Where(x => x.Patronymic == employeeFilter.Patronymic);
             }
 
             if (employeeFilter.Passport != 0)
