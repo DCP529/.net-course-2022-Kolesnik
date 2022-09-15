@@ -1,0 +1,22 @@
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Models.ModelsDb
+{
+    [Table(name: "Account")]
+    public class AccountDb
+    {
+        [Column("id")]
+        public Guid Id { get; set; }
+
+        [Column("currency_name")]
+        public string CurrencyName { get; set; }
+
+        [Column("amount")]
+        public int Amount { get; set; }
+
+        [Column("client_id")]
+        public Guid ClientId { get; set; }
+    }
+}

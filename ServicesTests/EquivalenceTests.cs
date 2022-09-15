@@ -3,6 +3,7 @@ using Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Models.ModelsDb;
 using Xunit;
 
 namespace ServicesTests
@@ -19,7 +20,7 @@ namespace ServicesTests
             //Act
             var client1 = dictionary.FirstOrDefault(c => c.Key.Phone == 77500001);
 
-            var client2 = new Client()
+            var client2 = new ClientDb()
             {
                 Phone = 77500001,
                 BirthDate = client1.Key.BirthDate,
@@ -42,11 +43,11 @@ namespace ServicesTests
             var dataGenerator = new TestDataGenerator();
 
             var employeeList = dataGenerator.GenerateListEmployee();
-            employeeList.Add(new Employee() { Phone = 77700001 });
+            employeeList.Add(new EmployeeDb() { Phone = 77700001 });
 
             //Act
 
-            var employee = new Employee() { Phone = 77700001 };
+            var employee = new EmployeeDb() { Phone = 77700001 };
 
             var findEmployee = employeeList.Find(e => e == employee);
 

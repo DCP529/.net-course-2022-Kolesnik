@@ -9,7 +9,7 @@ namespace Services.Filters
         public string Patronymic { get; set; }
         public int Phone { get; set; }
         public int Passport { get; set; }
-
+        public Guid Id { get; set; }
         public Tuple<DateTime, DateTime> BirthDayRange { get; set; }
     }
 }
