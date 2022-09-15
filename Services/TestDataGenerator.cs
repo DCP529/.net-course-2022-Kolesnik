@@ -1,7 +1,6 @@
 using Models;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Bogus;
 using Bogus.DataSets;
 using Currency = Models.Currency;
@@ -12,7 +11,6 @@ namespace Services
     {
         public List<Client> GenerateListClient()
         {
-            int i = 0;
 
             List<Client> clients = new List<Client>();
 
@@ -20,22 +18,21 @@ namespace Services
     .StrictMode(true)
     .RuleFor(x => x.FirstName, f => f.Name.FirstName())
     .RuleFor(x => x.LastName, f => f.Name.LastName())
-    .RuleFor(x => x.Patronymic, f => "")
+    .RuleFor(x => x.Patronymic, f => f.Name.FirstName())
     .RuleFor(x => x.Passport, f => f.Random.Int(1, 500))
-    .RuleFor(x => x.Phone, f => 77500000 + i)
+    .RuleFor(x => x.Phone, f => 77500000 + f.Random.Number(999))
     .RuleFor(x => x.BirthDate, f => f.Date.Between(DateTime.Parse("01.01.1950"), DateTime.Parse("01.01.2004")));
 
-            for (i = 0; i <= 999; i++)
-            {
-                clients.Add(generator.Generate());
-            }
+
+
+            clients.AddRange(generator.Generate(999));
+
 
             return clients;
         }
 
         public List<Employee> GenerateListEmployee()
         {
-            int i = 0;
 
             List<Employee> employees = new List<Employee>();
 
@@ -43,17 +40,16 @@ namespace Services
     .StrictMode(true)
     .RuleFor(x => x.FirstName, f => f.Name.FirstName())
     .RuleFor(x => x.LastName, f => f.Name.LastName())
-    .RuleFor(x => x.Patronymic, f => "")
+    .RuleFor(x => x.Patronymic, f => f.Name.FirstName())
     .RuleFor(x => x.Passport, f => f.Random.Int(1, 500))
-    .RuleFor(x => x.Phone, f => 77500000 + i)
+    .RuleFor(x => x.Phone, f => 77500000 + f.Random.Number(999))
     .RuleFor(x => x.Salary, f => f.Random.Decimal(1_000, 100_000))
     .RuleFor(x => x.Contract, f => "")
     .RuleFor(x => x.BirthDate, f => f.Date.Between(DateTime.Parse("01.01.1950"), DateTime.Parse("01.01.2004")));
 
-            for ( i = 0; i <= 999; i++)
-            {
-                employees.Add(generator.Generate());
-            }
+
+            employees.AddRange(generator.Generate(999));
+
 
             return employees;
         }
@@ -74,7 +70,7 @@ namespace Services
     .RuleFor(x => x.BirthDate, f => f.Date.Between(DateTime.Parse("01.01.1990"), DateTime.Now));
 
             for (i = 0; i <= 999; i++)
-            {                
+            {
                 var fakeClient = generator.Generate();
                 clients.Add(fakeClient.Phone, fakeClient);
             }
@@ -88,7 +84,7 @@ namespace Services
 
             var fakeClients = GenerateListClient();
 
-            string[] fakeCurrencyName = {"Rub", "Lei", "Eu", "Ua"};           
+            string[] fakeCurrencyName = { "Rub", "Lei", "Eu", "Ua" };
 
             var currency = new Currency()
             {

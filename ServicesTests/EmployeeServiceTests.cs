@@ -1,4 +1,4 @@
-﻿using Models;
+using Models;
 using Services;
 using Services.Exceptions;
 using Services.Filters;
@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Models.ModelsDb;
 using Xunit;
 
 namespace ServicesTests
@@ -19,10 +20,11 @@ namespace ServicesTests
 
             EmployeeService employeeService = new EmployeeService(new EmployeeStorage());
 
-            var employee = new Employee()
+            var employee = new EmployeeDb()
             {
                 BirthDate = DateTime.Parse("01.01.2005"),
-                Passport = 2
+                Passport = 2,
+                Id = Guid.NewGuid()
             };
 
             //Act/Assert
@@ -37,10 +39,11 @@ namespace ServicesTests
 
             EmployeeService employeeService = new EmployeeService(new EmployeeStorage());
 
-            var employee = new Employee()
+            var employee = new EmployeeDb()
             {
                 BirthDate = DateTime.Parse("01.01.2004"),
-                Passport = 0
+                Passport = 0,
+                Id = Guid.NewGuid()
             };
 
             //Act/Assert
@@ -55,7 +58,7 @@ namespace ServicesTests
 
             EmployeeService employeeService = new EmployeeService(new EmployeeStorage());
 
-            var employee1 = new Employee()
+            var employee1 = new EmployeeDb()
             {
                 BirthDate = DateTime.Parse("01.01.2003"),
                 FirstName = "Сергей",
@@ -63,9 +66,10 @@ namespace ServicesTests
                 Passport = 1,
                 Patronymic = "Игоревич",
                 Phone = 1,
+                Id = Guid.NewGuid()
             };
 
-            var employee2 = new Employee()
+            var employee2 = new EmployeeDb()
             {
                 BirthDate = DateTime.Parse("01.01.1987"),
                 FirstName = "Сергей",
@@ -73,9 +77,10 @@ namespace ServicesTests
                 Passport = 1,
                 Patronymic = "Игоревич",
                 Phone = 1,
+                Id = Guid.NewGuid()
             };
 
-            var employee3 = new Employee()
+            var employee3 = new EmployeeDb()
             {
                 BirthDate = DateTime.Parse("01.01.1997"),
                 FirstName = "Сергей",
@@ -83,6 +88,7 @@ namespace ServicesTests
                 Passport = 1,
                 Patronymic = "Игоревич",
                 Phone = 1,
+                Id = Guid.NewGuid()
             };
 
             //Act
@@ -107,6 +113,114 @@ namespace ServicesTests
             Assert.Equal(young, employee1.BirthDate);
             Assert.Equal(old, employee2.BirthDate);
             Assert.Equal(averageAge.Year, 1995);
+        }
+
+        [Fact]
+        public void Add_EmployeeTests()
+        {
+            //Arrange
+
+            var emploService = new EmployeeService(new EmployeeStorage());
+
+            var employee1 = new EmployeeDb()
+            {
+                BirthDate = DateTime.Parse("01.01.2003"),
+                FirstName = "Сергей",
+                LastName = "Сидоров",
+                Passport = 1,
+                Patronymic = "Игоревич",
+                Phone = 1,
+                Contract = "",
+                Salary = 1_500,
+                Id = Guid.NewGuid()
+            };
+
+            //Act
+
+            emploService.AddEmployee(employee1);
+
+            var listEmployee = emploService.GetEmployees(new EmployeeFilter() {Passport = 1});
+
+            //Assert
+
+            Assert.Equal(listEmployee.Count, 1);
+        }
+
+        [Fact]
+        public void Update_EmployeeTests()
+        {
+            //Arange
+
+            var emploService = new EmployeeService(new EmployeeStorage());
+
+            var employee1 = new EmployeeDb()
+            {
+                BirthDate = DateTime.Parse("01.01.2003"),
+                FirstName = "Сергей",
+                LastName = "Сидоров",
+                Passport = 1,
+                Patronymic = "Игоревич",
+                Phone = 1,
+                Contract = "",
+                Salary = 1_500,
+                Id = Guid.NewGuid()
+            };
+
+            var employee2 = new EmployeeDb()
+            {
+                BirthDate = DateTime.Parse("01.01.2003"),
+                FirstName = "Евгений",
+                LastName = "Зеленский",
+                Passport = 1,
+                Patronymic = "Игоревич",
+                Phone = 1,
+                Contract = "",
+                Salary = 15_000,
+                Id = Guid.NewGuid()
+            };
+
+            //Act
+
+            emploService.AddEmployee(employee1);
+            emploService.Update(employee2);
+
+            var updateEmployee = emploService.GetEmployees(new EmployeeFilter() { Passport = employee1.Passport })
+                .FirstOrDefault(x => x.Passport == employee1.Passport);
+
+            //Assert
+            Assert.Equal(employee1.Passport, updateEmployee.Passport);
+        }
+
+        [Fact]
+        public void Delete_EmployeeTests()
+        {
+            //Arange
+
+            var emploService = new EmployeeService(new EmployeeStorage());
+
+            var employee1 = new EmployeeDb()
+            {
+                BirthDate = DateTime.Parse("01.01.2003"),
+                FirstName = "Сергей",
+                LastName = "Сидоров",
+                Passport = 1,
+                Patronymic = "Игоревич",
+                Phone = 1,
+                Contract = "",
+                Salary = 1_500,
+                Id = Guid.NewGuid()
+            };
+
+            //Act
+
+            emploService.AddEmployee(employee1);
+            emploService.Delete(employee1);
+
+            var deletedEmployee = emploService.GetEmployees(new EmployeeFilter() {Passport = 1});
+
+            //Assert
+
+            Assert.Equal(deletedEmployee.Count, 0);
         }
     }
 }

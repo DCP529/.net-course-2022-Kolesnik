@@ -1,22 +1,24 @@
-﻿using Models;
 using Services.Exceptions;
-using Services.Filters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using Services.Storage;
+using Services.Filters;
+using Models;
+using Models.ModelsDb;
 
 namespace Services
 {
     public class ClientService
     {
-        private ClientStorage _clients = new ClientStorage();
+        private IClientStorage _clients;
 
-        public ClientService(ClientStorage clientStorage)
+        public ClientService(IClientStorage clientStorage)
         {
             _clients = clientStorage;
         }
-
-        public void AddClient(Client client)
+        public void AddClient(ClientDb client)
         {
             if (client.BirthDate > DateTime.Parse("31.12.2004"))
             {
@@ -28,38 +30,98 @@ namespace Services
                 throw new PassportNullException("Нельзя добавить клиента без паспортных данных!");
             }
 
-            _clients.AddClient(client);
+            
+            _clients.Add(client);
+            
         }
 
-        public Dictionary<Client, List<Account>> GetClients(ClientFilter clientFilters)
+        public ClientDb GetClientById(Guid clientId) 
         {
-            IEnumerable<KeyValuePair<Client, List<Account>>> query = _clients.clients.Select(t => t);
+            IsClientInDatabase(_clients.Data.Clients.FirstOrDefault(x => x.Id == clientId));
+
+            return _clients.GetClientById(clientId);
+        }
+
+        public List<ClientDb> GetClientsList(ClientFilter clientFilters)
+        {
+            var query = _clients.Data.Clients.Select(t => t).AsQueryable();
 
             if (clientFilters.FirstName != null && clientFilters.LastName != null && clientFilters.Patronymic != null)
             {
-                query.Where(x => x.Key.FirstName == clientFilters.FirstName)
-                    .Where(x => x.Key.LastName == clientFilters.LastName)
-                    .Where(x => x.Key.Patronymic == clientFilters.Patronymic);
+                query.Where(x => x.FirstName == clientFilters.FirstName)
+                    .Where(x => x.LastName == clientFilters.LastName)
+                    .Where(x => x.Patronymic == clientFilters.Patronymic);
             }
 
             if (clientFilters.Passport != 0)
             {
-                query = query.Where(x => x.Key.Passport == clientFilters.Passport);
+                query.Where(x => x.Passport == clientFilters.Passport);
             }
 
             if (clientFilters.Phone != 0)
             {
-                query.Where(x => x.Key.Phone == clientFilters.Phone);
+                query.Where(x => x.Phone == clientFilters.Phone);
             }
 
             if (clientFilters.BirthDayRange != null)
             {
-                query.Where(x => x.Key.BirthDate >= clientFilters.BirthDayRange.Item1 &&
-                                 x.Key.BirthDate <= clientFilters.BirthDayRange.Item2);
+                query.Where(x => x.BirthDate >= clientFilters.BirthDayRange.Item1 &&
+                                 x.BirthDate <= clientFilters.BirthDayRange.Item2);
             }
 
-            return query.ToDictionary(t => t.Key, t => t.Value);
+            
+            return query.ToList();
+        }
 
+        public void Update(ClientDb client)
+        {
+            IsClientInDatabase(client);
+
+            _clients.Update(client.Id, client);
+        }
+
+        public void Delete(ClientDb client)
+        {
+            IsClientInDatabase(client);
+
+            _clients.Delete(client.Id);
+        }
+
+        public void AddAccount(ClientDb client, AccountDb account)
+        {
+            IsClientInDatabase(client);
+
+            _clients.AddAccount(client.Id, account);
+        }
+
+        public void UpdateAccount(ClientDb client, AccountDb account) 
+        {
+            IsAccountInDatabase(account);
+
+            _clients.UpdateAccount(client.Id, account);
+        }
+
+        public void DeleteAccount(ClientDb client, AccountDb account)
+        {
+            IsAccountInDatabase(account);
+
+            _clients.DeleteAccount(client.Id, account);
+        }
+
+        private void IsClientInDatabase(ClientDb client)
+        {
+            if (!_clients.Data.Clients.Contains(_clients.Data.Clients.FirstOrDefault(x => x.Id == client.Id)))
+            {
+                throw new ArgumentException("Клиент не найден!");
+            }
+        }
+
+        private void IsAccountInDatabase(AccountDb account)
+        {
+            if (!_clients.Data.Accounts.Contains(_clients.Data.Accounts.FirstOrDefault(x => x.Id == account.Id)))
+            {
+                throw new ArgumentException("Аккаунт не найден!");
+            }
         }
     }
 }
