@@ -69,7 +69,7 @@ namespace Services
                                          x.BirthDate <= clientFilters.BirthDayRange.Item2);
             }
 
-            if (clientFilters.Id != null)
+            if (clientFilters.Id != Guid.Empty)
             {
                 query = query.Where(x => x.Id == clientFilters.Id);
             }
