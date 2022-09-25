@@ -77,6 +77,10 @@ namespace ServicesTests
 
             var updateClient = clientService.GetClientById(client1.Id);
 
+            clientService.Update(client1);
+
+            updateClient = clientService.GetClientById(client1.Id);
+
             //Assert
             Assert.Equal(client1.Passport, updateClient.Passport);
         }
