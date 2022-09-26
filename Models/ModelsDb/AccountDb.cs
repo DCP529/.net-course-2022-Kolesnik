@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Models.ModelsDb
 {
-    [Table(name: "Account")]
+    [Table(name: "account")]
     public class AccountDb
     {
         [Column("id")]
@@ -18,5 +18,7 @@ namespace Models.ModelsDb
 
         [Column("client_id")]
         public Guid ClientId { get; set; }
+
+        public ClientDb Client { get; set; }
     }
 }

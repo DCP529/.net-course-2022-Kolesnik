@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Models.ModelsDb
 {
-    [Table(name: "Employee")]
+    [Table(name: "employee")]
     public class EmployeeDb
     {
         [Key]

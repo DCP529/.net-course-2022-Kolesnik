@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Models.ModelsDb
 {
-    [Table(name: "Client")]
+    [Table(name: "client")]
     public class ClientDb
     {
         [Key]
@@ -32,5 +32,7 @@ namespace Models.ModelsDb
 
         [Column("birth_date")]
         public DateTime BirthDate { get; set; }
+
+        public ICollection<AccountDb> Accounts { get; set; }
     }
 }
