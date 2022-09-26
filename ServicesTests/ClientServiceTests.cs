@@ -19,26 +19,26 @@ namespace ServicesTests
         {
             //Arange
 
-            var clientService = new ClientService(new ClientStorage());
+            var clientService = new ClientService(new BankDbContext());
 
             var ts = new TestDataGenerator();
 
 
             //Act
 
-            List<ClientDb> clients = ts.GenerateListClient();
+            List<Client> clients = ts.GenerateListClient();
 
             foreach (var client in clients)
             {
                 clientService.AddClient(client);
             }
 
-            var whereClientFilter = clientService.GetClientsList(new ClientFilter()
+            var whereClientFilter = clientService.GetClients(new ClientFilter()
             {
                 BirthDayRange = new Tuple<DateTime, DateTime>(DateTime.Parse("01.01.1922"), DateTime.Parse("31.12.2004")),
             });
 
-            var orderByFilter = whereClientFilter.OrderBy(x => x.Id);
+            var orderByFilter = whereClientFilter.OrderBy(x => x.Phone);
 
             var groupByFilter = whereClientFilter.GroupBy(x => x.BirthDate);
 
@@ -54,35 +54,34 @@ namespace ServicesTests
         {
             //Arange
 
-            var clientService = new ClientService(new ClientStorage());
+            var clientService = new ClientService(new BankDbContext());
 
-            var client1 = new ClientDb()
+            var client = new Client()
             {
                 BirthDate = DateTime.Parse("01.01.2003"),
-                FirstName = "Сергей",
+                FirstName = "Петр",
                 LastName = "Сидоров",
-                Passport = 1,
+                Passport = 98,
                 Patronymic = "Игоревич",
-                Phone = 1,
-                Id = Guid.NewGuid()
+                Phone = 1
             };
 
             //Act
 
-            clientService.AddClient(client1);
+            clientService.AddClient(client);
 
-            client1.FirstName = "Станислав";
+            client.FirstName = "Станислав";
 
-            clientService.Update(client1);
+            clientService.Update(Guid.Parse("4c233c84-d0c6-4ff9-bb6b-dfbd517be79c"), client);
 
-            var updateClient = clientService.GetClientById(client1.Id);
+            var updateClient = clientService.GetClientById(Guid.Parse("4c233c84-d0c6-4ff9-bb6b-dfbd517be79c"));
 
-            clientService.Update(client1);
+            clientService.Update(Guid.Parse("4c233c84-d0c6-4ff9-bb6b-dfbd517be79c"), client);
 
-            updateClient = clientService.GetClientById(client1.Id);
+            updateClient = clientService.GetClientById(Guid.Parse("4c233c84-d0c6-4ff9-bb6b-dfbd517be79c"));
 
             //Assert
-            Assert.Equal(client1.Passport, updateClient.Passport);
+            Assert.Equal(client.Passport, updateClient.Passport);
         }
 
         [Fact]
@@ -90,33 +89,24 @@ namespace ServicesTests
         {
             //Arange
 
-            var clientService = new ClientService(new ClientStorage());
+            var clientService = new ClientService(new BankDbContext());
 
-
-
-            var client = new ClientDb()
+            var clients = clientService.GetClients(new ClientFilter()
             {
-                BirthDate = DateTime.Parse("01.01.2003"),
-                FirstName = "Сергей",
-                LastName = "Сидоров",
-                Passport = 1,
-                Patronymic = "Игоревич",
-                Phone = 1,
-                Id = Guid.NewGuid()
-            };
+                Passport = 1
+            });
 
             //Act
+            
+            clientService.Delete(Guid.Parse("04bcee72-6c75-419c-93ee-2e27634908e7"));
 
-            clientService.AddClient(client);
-            clientService.Delete(client);
-
-            var deletedClient = clientService.GetClientsList(new ClientFilter()
+            var deletedClient = clientService.GetClients(new ClientFilter()
             {
                 Passport = 1
             });
 
             //Assert
-            Assert.Equal(deletedClient.Count, 9);
+            Assert.Equal(deletedClient.Count, clients.Count - 1);
         }
 
         

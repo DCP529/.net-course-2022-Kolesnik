@@ -38,5 +38,8 @@ namespace Models.ModelsDb
 
         [Column("salary")]
         public decimal Salary { get; set; }
+
+        [Column("bonus")]
+        public int Bonus { get; set; }
     }
 }

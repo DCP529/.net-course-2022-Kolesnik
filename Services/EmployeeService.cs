@@ -7,20 +7,30 @@ using System.Text;
 using Models.ModelsDb;
 using Services.Filters;
 using Services.Storage;
+using AutoMapper;
 
 namespace Services
 {
     public class EmployeeService
     {
-        private IEmployeeStorage _employees = new EmployeeStorage();
+        private BankDbContext _employees;
 
-        public EmployeeService(IEmployeeStorage employeeStorage)
+        public EmployeeService(BankDbContext employeeStorage)
         {
             _employees = employeeStorage;
         }
 
-        public void AddEmployee(EmployeeDb employee)
+        public void AddEmployee(Employee employee)
         {
+            var employeeDb = new EmployeeDb();
+
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Employee, EmployeeDb>());
+
+            var mapper = new Mapper(config);
+
+            employeeDb = mapper.Map<EmployeeDb>(employee); 
+            employeeDb.Id = Guid.NewGuid();
+
             if (employee.BirthDate > DateTime.Parse("31.12.2004"))
             {
                 throw new AgeLimitException("Возраст клиента должен быть больше 18!");
@@ -31,31 +41,49 @@ namespace Services
                 throw new PassportNullException("Нельзя добавить клиента без паспортных данных!");
             }
 
-            if (!_employees.Data.Employees.Contains(employee))
+            if (!_employees.Employees.Contains(employeeDb))
             {
-                _employees.Add(employee);
+                _employees.Employees.Add(employeeDb);
             }
         }
 
-        public void Update(EmployeeDb employee)
+        public void Update(Guid employeeId, Employee employee)
         {
-            IsEmployeeInDictionary(employee);
+            var employeeDb = new EmployeeDb();
 
-            _employees.Update(employee.Id, employee);
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Employee, EmployeeDb>());
+
+            var mapper = new Mapper(config);
+
+            employeeDb = mapper.Map<EmployeeDb>(employee);
+            employeeDb.Id = employeeId;
+            
+            IsEmployeeInDictionary(employeeDb);
+
+            if (_employees.Employees.FirstOrDefault(x => x.Id == employeeId) != null)
+            {
+                var getClient = _employees.Employees.FirstOrDefault(x => x.Id == employeeId);
+
+                _employees.Entry(getClient).CurrentValues.SetValues(employeeDb);
+
+                _employees.SaveChanges();
+            }
         }
 
-        public void Delete(EmployeeDb employee)
+        public void Delete(Guid id)
         {
+            var employee = _employees.Employees.FirstOrDefault(x => x.Id == id);
+
             IsEmployeeInDictionary(employee);
 
-            _employees.Delete(employee.Id);
+            _employees.Employees.Remove(employee);
         }
 
         private void IsEmployeeInDictionary(EmployeeDb employee)
         {
-            var findEmployee = _employees.Data.Employees.FirstOrDefault(x => x.Id == employee.Id);
+            var findEmployee = _employees.Employees.FirstOrDefault(x => x.Id == employee.Id);
 
-            if (!_employees.Data.Employees.Contains(findEmployee))
+            if (!_employees.Employees.Contains(findEmployee))
             {
                 throw new ArgumentException("Сотрудник не найден!");
             }
@@ -63,7 +91,9 @@ namespace Services
 
         public List<EmployeeDb> GetEmployees(EmployeeFilter employeeFilter)
         {
-            var query = _employees.Data.Employees.Select(t => t);
+            var employeeList = new List<Employee>();
+
+            var query = _employees.Employees.Select(t => t);
 
             if (employeeFilter.FirstName != null && employeeFilter.LastName != null && employeeFilter.Patronymic != null)
             {
@@ -87,13 +117,23 @@ namespace Services
                 query = query.Where(x => x.BirthDate >= employeeFilter.BirthDayRange.Item1 && x.BirthDate <= employeeFilter.BirthDayRange.Item2);
             }
 
-            if (employeeFilter.Id != null)
+            if (employeeFilter.Id != Guid.Empty)
             {
                 query = query.Where(x => x.Id == employeeFilter.Id);
             }
-            
 
-            return query.ToList();
+            var employeeDb = new List<EmployeeDb>();
+
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<EmployeeDb, Employee>());
+
+            var mapper = new Mapper(config);
+
+            foreach (var item in query)
+            {
+                employeeDb.Add(mapper.Map<EmployeeDb>(item));
+            }
+
+            return employeeDb;
         }
     }
 }

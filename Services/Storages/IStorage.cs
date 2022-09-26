@@ -10,8 +10,8 @@ namespace Services
     {
         public void Add(T item);
 
-        public void Update(Guid id, T item);
+        public void Update(T item);
 
-        public void Delete(Guid item);
+        public void Delete(T item);
     }
 }

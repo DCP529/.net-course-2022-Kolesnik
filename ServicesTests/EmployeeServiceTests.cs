@@ -13,20 +13,19 @@ namespace ServicesTests
 {
     public class EmployeeServiceTests
     {
-
         [Fact]
-        public void Filter_ClientsTest()
+        public void Filter_EmployeeTest()
         {
             //Arange
 
-            var employeeService = new EmployeeService(new EmployeeStorage());
+            var employeeService = new EmployeeService(new BankDbContext());
 
             var ts = new TestDataGenerator();
 
 
             //Act
 
-            List<EmployeeDb> employees = ts.GenerateListEmployee();
+            List<Employee> employees = ts.GenerateListEmployee();
 
             foreach (var employee in employees)
             {
@@ -54,33 +53,24 @@ namespace ServicesTests
         {
             //Arange
 
-            var emploService = new EmployeeService(new EmployeeStorage());
+            var emploService = new EmployeeService(new BankDbContext());
 
-            var employee1 = new EmployeeDb()
+            var employee = emploService.GetEmployees(new EmployeeFilter() { Id = Guid.Parse("c187a3a2-943c-e65e-4660-0a89e2b4cca6") }).FirstOrDefault();
+
+            var newEmployee = new Employee()
             {
-                BirthDate = DateTime.Parse("01.01.2003"),
-                FirstName = "Сергей",
-                LastName = "Сидоров",
-                Passport = 1,
-                Patronymic = "Игоревич",
-                Phone = 1,
-                Contract = "",
-                Salary = 1_500,
-                Id = Guid.NewGuid()
+                FirstName = "Jim"
             };
 
             //Act
 
-            emploService.AddEmployee(employee1);
+            emploService.Update(employee.Id, newEmployee);
 
-            employee1.FirstName = "Святополк";
-            emploService.Update(employee1);
-
-            var updateEmployee = emploService.GetEmployees(new EmployeeFilter() { Id = employee1.Id })
-                .FirstOrDefault(x => x.Id == employee1.Id);
+            var updateEmployee = emploService.GetEmployees(new EmployeeFilter() { Id = employee.Id })
+                .FirstOrDefault(x => x.Id == employee.Id);
 
             //Assert
-            Assert.Equal(employee1.Passport, updateEmployee.Passport);
+            Assert.Equal(employee.FirstName, updateEmployee.FirstName);
         }
 
         [Fact]
@@ -88,31 +78,23 @@ namespace ServicesTests
         {
             //Arange
 
-            var emploService = new EmployeeService(new EmployeeStorage());
+            var emploService = new EmployeeService(new BankDbContext());
 
-            var employee1 = new EmployeeDb()
+            var employees = emploService.GetEmployees(new EmployeeFilter() { Passport = 1 });
+
+            var employee = emploService.GetEmployees(new EmployeeFilter()
             {
-                BirthDate = DateTime.Parse("01.01.2003"),
-                FirstName = "Сергей",
-                LastName = "Сидоров",
-                Passport = 1,
-                Patronymic = "Игоревич",
-                Phone = 1,
-                Contract = "",
-                Salary = 1_500,
-                Id = Guid.NewGuid()
-            };
+                Passport = 1
+            }).FirstOrDefault();
 
             //Act
-
-            emploService.AddEmployee(employee1);
-            emploService.Delete(employee1);
+            emploService.Delete(employee.Id);
 
             var deletedEmployee = emploService.GetEmployees(new EmployeeFilter() {Passport = 1});
 
             //Assert
 
-            Assert.Equal(deletedEmployee.Count, 6);
+            Assert.Equal(deletedEmployee.Count, employees.Count - 1);
         }
     }
 }

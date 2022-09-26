@@ -11,34 +11,29 @@ namespace Services
 {
     public class EmployeeStorage : IEmployeeStorage
     {
-        public BankDbContext Data { get; }
+        public List<Employee> Data { get; }
 
         public EmployeeStorage()
         {
-            Data = new BankDbContext();
+            Data = new List<Employee>();
         }
 
-        public void Add(EmployeeDb employee)
+        public void Add(Employee employee)
         {
-            Data.Employees.Add(employee);
-
-            Data.SaveChanges();
+            Data.Add(employee);
         }
 
-        public void Update(Guid id, EmployeeDb employee)
+        public void Update(Employee employee)
         {
-            var getEmployee = Data.Employees.FirstOrDefault(x => x.Id == employee.Id);
+            var result = Data.Find(x => x.Passport == employee.Passport);
 
-            Data.Entry(getEmployee).CurrentValues.SetValues(employee);
-
-            Data.SaveChanges();
+            Data.Remove(result);
+            Data.Add(employee);
         }
 
-        public void Delete(Guid id)
+        public void Delete(Employee employee)
         {
-            Data.Employees.Remove(Data.Employees.FirstOrDefault(x => x.Id == id));
-
-            Data.SaveChanges();
+            Data.Remove(employee);
         }
     }
 }

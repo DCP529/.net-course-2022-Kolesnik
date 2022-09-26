@@ -10,49 +10,46 @@ namespace Services
 {
     public class TestDataGenerator
     {
-        public List<ClientDb> GenerateListClient()
+        public List<Client> GenerateListClient()
         {
 
-            List<ClientDb> clients = new List<ClientDb>();
+            List<Client> clients = new List<Client>();
 
-            Faker<ClientDb> generator = new Faker<ClientDb>()
+            Faker<Client> generator = new Faker<Client>()
     .StrictMode(true)
     .RuleFor(x => x.FirstName, f => f.Name.FirstName())
-    .RuleFor(x => x.Id, f => f.Random.Guid())
     .RuleFor(x => x.LastName, f => f.Name.LastName())
     .RuleFor(x => x.Patronymic, f => f.Name.FirstName())
     .RuleFor(x => x.Passport, f => f.Random.Int(1, 500))
+    .RuleFor(x => x.Bonus, f => 0)
+    .RuleFor(x => x.Id, f => f.Random.Guid())
     .RuleFor(x => x.Phone, f => 77500000 + f.Random.Number(999))
     .RuleFor(x => x.BirthDate, f => f.Date.Between(DateTime.Parse("01.01.1950"), DateTime.Parse("01.01.2004")));
 
-
-
             clients.AddRange(generator.Generate(999));
-
 
             return clients;
         }
 
-        public List<EmployeeDb> GenerateListEmployee()
+        public List<Employee> GenerateListEmployee()
         {
 
-            List<EmployeeDb> employees = new List<EmployeeDb>();
+            List<Employee> employees = new List<Employee>();
 
-            Faker<EmployeeDb> generator = new Faker<EmployeeDb>()
+            Faker<Employee> generator = new Faker<Employee>()
     .StrictMode(true)
     .RuleFor(x => x.FirstName, f => f.Name.FirstName())
-    .RuleFor(x => x.Id, f => f.Random.Guid())
     .RuleFor(x => x.LastName, f => f.Name.LastName())
     .RuleFor(x => x.Patronymic, f => f.Name.FirstName())
     .RuleFor(x => x.Passport, f => f.Random.Int(1, 500))
     .RuleFor(x => x.Phone, f => 77500000 + f.Random.Number(999))
     .RuleFor(x => x.Salary, f => f.Random.Decimal(1_000, 100_000))
+    .RuleFor(x => x.Bonus, f => 0)
+    .RuleFor(x => x.Id, f => f.Random.Guid())
     .RuleFor(x => x.Contract, f => "")
     .RuleFor(x => x.BirthDate, f => f.Date.Between(DateTime.Parse("01.01.1950"), DateTime.Parse("01.01.2004")));
 
-
             employees.AddRange(generator.Generate(999));
-
 
             return employees;
         }
@@ -70,6 +67,7 @@ namespace Services
     .RuleFor(x => x.Patronymic, f => "")
     .RuleFor(x => x.Passport, f => f.Random.Int(1, 1000))
     .RuleFor(x => x.Phone, f => 77500000 + i)
+    .RuleFor(x => x.Id, f => f.Random.Guid())
     .RuleFor(x => x.BirthDate, f => f.Date.Between(DateTime.Parse("01.01.1990"), DateTime.Now));
 
             for (i = 0; i <= 999; i++)
@@ -81,9 +79,9 @@ namespace Services
             return clients;
         }
 
-        public Dictionary<ClientDb, List<Account>> GenerateDictionaryClientAccount()
+        public Dictionary<Client, List<Account>> GenerateDictionaryClientAccount()
         {
-            Dictionary<ClientDb, List<Account>> clients = new Dictionary<ClientDb, List<Account>>();
+            Dictionary<Client, List<Account>> clients = new Dictionary<Client, List<Account>>();
             
             var fakeClients = GenerateListClient();
 

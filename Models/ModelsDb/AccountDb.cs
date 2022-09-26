@@ -19,6 +19,7 @@ namespace Models.ModelsDb
         [Column("client_id")]
         public Guid ClientId { get; set; }
 
+
         public ClientDb Client { get; set; }
     }
 }

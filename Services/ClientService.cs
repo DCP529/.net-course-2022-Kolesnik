@@ -2,49 +2,37 @@ using Services.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Services.Storage;
 using Services.Filters;
 using Models;
 using Models.ModelsDb;
+using Bogus.DataSets;
 
 namespace Services
 {
     public class ClientService
     {
-        private IClientStorage _clients;
+        private BankDbContext _clients;
 
-        public ClientService(IClientStorage clientStorage)
+        public ClientService(BankDbContext clientStorage)
         {
             _clients = clientStorage;
-        }
-        public void AddClient(ClientDb client)
-        {
-            if (client.BirthDate > DateTime.Parse("31.12.2004"))
-            {
-                throw new AgeLimitException("Возраст клиента должен быть больше 18!");
-            }
-
-            if (client.Passport == 0)
-            {
-                throw new PassportNullException("Нельзя добавить клиента без паспортных данных!");
-            }
-
-            
-            _clients.Add(client);
-            
         }
 
         public ClientDb GetClientById(Guid clientId) 
         {
-            IsClientInDatabase(_clients.Data.Clients.FirstOrDefault(x => x.Id == clientId));
+            IsClientInDatabase(_clients.Clients.FirstOrDefault(x => x.Id == clientId));
 
-            return _clients.GetClientById(clientId);
+            return _clients.Clients.FirstOrDefault(x => x.Id == clientId);
         }
 
-        public List<ClientDb> GetClientsList(ClientFilter clientFilters)
+        public List<Client> GetClients(ClientFilter clientFilters)
         {
-            var query = _clients.Data.Clients.AsQueryable();
+            var list = new List<Client>();
+
+            var query = _clients.Clients.Select(t => t);
 
             if (clientFilters.FirstName != null && clientFilters.LastName != null && clientFilters.Patronymic != null)
             {
@@ -69,53 +57,131 @@ namespace Services
                                          x.BirthDate <= clientFilters.BirthDayRange.Item2);
             }
 
-            if (clientFilters.Id != Guid.Empty)
+            var clientConfig = new MapperConfiguration(cfg => cfg.CreateMap<ClientDb, Client>());
+
+            var accountConfig = new MapperConfiguration(cfg => cfg.CreateMap<AccountDb, Account>());
+
+            var clientMapper = new Mapper(clientConfig);
+
+            var accountMapper = new Mapper(accountConfig);
+
+            var accounts = new List<AccountDb>();
+
+            foreach (var item in query)
             {
-                query = query.Where(x => x.Id == clientFilters.Id);
+                list.Add(clientMapper.Map<Client>(item));
             }
 
-            
-            return query.ToList();
+            return list;
         }
 
-        public void Update(ClientDb client)
+        public void Update(Guid id, Client client)
         {
+            var clientConfig = new MapperConfiguration(cfg => cfg.CreateMap<Client, ClientDb>()
+                .ForMember(x => x.Accounts, f => new AccountDb()
+                {
+                    CurrencyName = "USD",
+                    Amount = 0,
+                    ClientId = id
+                }));
+
+            var clientMapper = new Mapper(clientConfig);
+
+            var clientDb = clientMapper.Map<ClientDb>(client);
+            clientDb.Id = id;
+
+            if (_clients.Clients.FirstOrDefault(x => x.Id == id) != null)
+            {
+                var getClient = _clients.Clients.FirstOrDefault(x => x.Id == id);
+
+                _clients.Entry(getClient).CurrentValues.SetValues(clientDb);
+
+                _clients.SaveChanges();
+            }
+        } 
+
+        public void Delete(Guid id)
+        {
+            var client = _clients.Clients.FirstOrDefault(x => x.Id == id);
+
             IsClientInDatabase(client);
 
-            _clients.Update(client.Id, client);
+            _clients.Clients.Remove(client);
+
+            _clients.SaveChanges();
         }
 
-        public void Delete(ClientDb client)
+        public void AddAccount(Guid clientId, Account account)
         {
+            var client = _clients.Clients.FirstOrDefault(x => x.Id == clientId);
+
             IsClientInDatabase(client);
 
-            _clients.Delete(client.Id);
+            var accountConfig = new MapperConfiguration(cfg => cfg.CreateMap<AccountDb, Account>());
+
+            var accountMapper = new Mapper(accountConfig);
+
+            var accountDb = accountMapper.Map<AccountDb>(account);
+            accountDb.Id = clientId;
+
+            IsAccountInDatabase(accountDb);
+
+            client.Accounts.Add(accountDb); 
+            _clients.Accounts.Add(accountDb);
+
+            _clients.SaveChanges();
         }
 
-        public void AddAccount(ClientDb client, AccountDb account)
+        public void UpdateAccount(Guid clientId, Account account) 
         {
-            IsClientInDatabase(client);
+            var accountConfig = new MapperConfiguration(cfg => cfg.CreateMap<AccountDb, Account>());
 
-            _clients.AddAccount(client.Id, account);
+            var accountMapper = new Mapper(accountConfig);
+
+            var accountDb = accountMapper.Map<AccountDb>(account);
+            accountDb.Id = clientId;
+
+            IsAccountInDatabase(accountDb);
+
+            var getAccount = _clients.Accounts.FirstOrDefault(x => x.ClientId == clientId);
+
+            _clients.Entry(getAccount).CurrentValues.SetValues(accountDb);
+
+            _clients.Accounts.Update(accountDb);
+
+            _clients.SaveChanges();
         }
 
-        public void UpdateAccount(ClientDb client, AccountDb account) 
+        public void DeleteAccount(Guid clientId, Account account)
         {
-            IsAccountInDatabase(account);
+            var accountConfig = new MapperConfiguration(cfg => cfg.CreateMap<AccountDb, Account>());
 
-            _clients.UpdateAccount(client.Id, account);
-        }
+            var accountMapper = new Mapper(accountConfig);
 
-        public void DeleteAccount(ClientDb client, AccountDb account)
-        {
-            IsAccountInDatabase(account);
+            var accountDb = accountMapper.Map<AccountDb>(account);
+            accountDb.Id = clientId;
 
-            _clients.DeleteAccount(client.Id, account);
+            IsAccountInDatabase(accountDb);
+
+            var deleteAccount = _clients.Accounts.Where(x => x.ClientId == clientId);
+
+            if (deleteAccount.Contains(accountDb))
+            {
+                _clients.Accounts.Remove(accountDb);
+            }
+
+            var client = _clients.Clients.FirstOrDefault(x => x.Id == clientId);
+
+            client.Accounts.Remove(accountDb);
+
+            _clients.SaveChanges();
         }
 
         private void IsClientInDatabase(ClientDb client)
         {
-            if (!_clients.Data.Clients.Contains(_clients.Data.Clients.FirstOrDefault(x => x.Id == client.Id)))
+            var clientDb = _clients.Clients.FirstOrDefault(x => x.Id == client.Id);
+
+            if (!_clients.Clients.Contains(clientDb))
             {
                 throw new ArgumentException("Клиент не найден!");
             }
@@ -123,10 +189,57 @@ namespace Services
 
         private void IsAccountInDatabase(AccountDb account)
         {
-            if (!_clients.Data.Accounts.Contains(_clients.Data.Accounts.FirstOrDefault(x => x.Id == account.Id)))
+            if (!_clients.Accounts.Contains(_clients.Accounts.FirstOrDefault(x => x.Id == account.Id)))
             {
                 throw new ArgumentException("Аккаунт не найден!");
             }
         }
+
+        public void AddClient(Client client)
+        {
+            ClientDb clientDb = new ClientDb() {Id = Guid.NewGuid()};
+
+            var defaultAccount = new AccountDb()
+            {
+                CurrencyName = "USD",
+                Amount = 0,
+                ClientId = clientDb.Id,
+                Id = Guid.NewGuid()
+            };
+
+            var clientConfig = new MapperConfiguration(cfg => cfg.CreateMap<Client, ClientDb>()
+                .ForMember(x => x.Accounts, f => new AccountDb()
+                {
+                    CurrencyName = "USD",
+                    Amount = 0,
+                    ClientId = clientDb.Id
+                }));
+
+            var clientMapper = new Mapper(clientConfig);
+
+            clientDb = clientMapper.Map<ClientDb>(client);
+            clientDb.Id = Guid.NewGuid();
+
+            if (client.BirthDate > DateTime.Parse("31.12.2004"))
+            {
+                throw new AgeLimitException("Возраст клиента должен быть больше 18!");
+            }
+
+            if (client.Passport == 0)
+            {
+                throw new PassportNullException("Нельзя добавить клиента без паспортных данных!");
+            }
+
+            if (!_clients.Clients.Contains(clientDb))
+            {
+                defaultAccount.Client = clientDb;
+
+                _clients.Clients.Add(clientDb);
+                _clients.Accounts.Add(defaultAccount);
+
+                _clients.SaveChanges();
+            }
+        }
     }
 }
+    

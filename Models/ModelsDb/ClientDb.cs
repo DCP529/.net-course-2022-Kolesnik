@@ -33,6 +33,9 @@ namespace Models.ModelsDb
         [Column("birth_date")]
         public DateTime BirthDate { get; set; }
 
+        [Column("bonus")]
+        public int Bonus { get; set; }
+
         public ICollection<AccountDb> Accounts { get; set; }
     }
 }

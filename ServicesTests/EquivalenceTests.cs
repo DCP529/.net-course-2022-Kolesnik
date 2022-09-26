@@ -20,7 +20,7 @@ namespace ServicesTests
             //Act
             var client1 = dictionary.FirstOrDefault(c => c.Key.Phone == 77500001);
 
-            var client2 = new ClientDb()
+            var client2 = new Client()
             {
                 Phone = 77500001,
                 BirthDate = client1.Key.BirthDate,
@@ -43,11 +43,11 @@ namespace ServicesTests
             var dataGenerator = new TestDataGenerator();
 
             var employeeList = dataGenerator.GenerateListEmployee();
-            employeeList.Add(new EmployeeDb() { Phone = 77700001 });
+            employeeList.Add(new Employee() { Phone = 77700001 });
 
             //Act
 
-            var employee = new EmployeeDb() { Phone = 77700001 };
+            var employee = new Employee() { Phone = 77700001 };
 
             var findEmployee = employeeList.Find(e => e == employee);
 

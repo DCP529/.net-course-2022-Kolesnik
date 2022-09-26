@@ -6,16 +6,14 @@ using Models.ModelsDb;
 
 namespace Services.Storage
 {
-    public interface IClientStorage : IStorage<ClientDb>
+    public interface IClientStorage : IStorage<Client>
     {
-        public BankDbContext Data { get; }
+        public Dictionary<Client, List<Account>> DataDictionary { get; }
 
-        public void AddAccount(Guid clientId, AccountDb account);
+        public void AddAccount(Client item, Account account);
 
-        public void UpdateAccount(Guid clientId, AccountDb account);
+        public void UpdateAccount(Client item, Account account);
 
-        public void DeleteAccount(Guid clientId, AccountDb account);
-
-        public ClientDb GetClientById(Guid clientId);
+        public void DeleteAccount(Client item, Account account);
     }
 }

@@ -6,8 +6,8 @@ using Models.ModelsDb;
 
 namespace Services.Storage
 {
-    public interface IEmployeeStorage : IStorage<EmployeeDb>
+    public interface IEmployeeStorage : IStorage<Employee>
     {
-        public BankDbContext Data { get; }
+        public List<Employee> Data { get; }
     }
 }

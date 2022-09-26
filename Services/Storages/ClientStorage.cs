@@ -2,11 +2,15 @@
 using System.Linq;
 using Services.Storage;
 using Models.ModelsDb;
+using Models;
+using System.Collections.Generic;
 
 namespace Services
 {
     public class ClientStorage : IClientStorage
     {
+        public Dictionary<Client, List<Account>> DataDictionary { get; }
+
         public BankDbContext Data { get; }
 
         public ClientStorage()
@@ -78,6 +82,54 @@ namespace Services
             }
 
             Data.SaveChanges();
+        }
+
+
+        public void Add(Client client)
+        {
+            var accountList = new List<Account> { new Account()
+            {
+                Currency = new Currency()
+                {
+                    Code = 1,
+                    Name = "USD"
+                }
+            } };
+
+            DataDictionary.Add(client, accountList);
+        }
+
+        public void Update(Client item)
+        {
+            var result = DataDictionary.FirstOrDefault(x => x.Key.Passport == item.Passport).Key;
+
+            var listAccount = DataDictionary[result];
+
+            DataDictionary.Remove(result);
+            DataDictionary.Add(item, listAccount);
+        }
+
+        public void Delete(Client item)
+        {
+            DataDictionary.Remove(item);
+        }
+
+        public void AddAccount(Client item, Account account)
+        {
+            DataDictionary[item].Add(account);
+        }
+
+        public void UpdateAccount(Client item, Account account)
+        {
+            var result = DataDictionary.FirstOrDefault(x => x.Value
+                .Find(x => x.Currency.Code == account.Currency.Code).Currency.Code == account.Currency.Code);
+
+            result.Value[1] = account;
+        }
+
+        public void DeleteAccount(Client item, Account account)
+        {
+            DataDictionary[item].Remove(account);
         }
     }
 }
