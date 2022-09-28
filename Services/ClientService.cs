@@ -21,11 +21,14 @@ namespace Services
             _clients = clientStorage;
         }
 
-        public ClientDb GetClientById(Guid clientId) 
+        public Client GetClientById(Guid clientId) 
         {
             IsClientInDatabase(_clients.Clients.FirstOrDefault(x => x.Id == clientId));
 
-            return _clients.Clients.FirstOrDefault(x => x.Id == clientId);
+            var clientConfig = new MapperConfiguration(cfg => cfg.CreateMap<ClientDb, Client>());
+            var clientMapper = new Mapper(clientConfig);
+
+            return clientMapper.Map<Client>(_clients.Clients.FirstOrDefault(x => x.Id == clientId));
         }
 
         public List<Client> GetClients(ClientFilter clientFilters)

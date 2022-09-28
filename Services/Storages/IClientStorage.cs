@@ -8,7 +8,7 @@ namespace Services.Storage
 {
     public interface IClientStorage : IStorage<Client>
     {
-        public Dictionary<Client, List<Account>> DataDictionary { get; }
+        public Dictionary<Client, List<Account>> Data { get; }
 
         public void AddAccount(Client item, Account account);
 

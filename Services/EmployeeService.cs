@@ -44,6 +44,8 @@ namespace Services
             if (!_employees.Employees.Contains(employeeDb))
             {
                 _employees.Employees.Add(employeeDb);
+
+                _employees.SaveChanges();
             }
         }
 
@@ -77,6 +79,8 @@ namespace Services
             IsEmployeeInDictionary(employee);
 
             _employees.Employees.Remove(employee);
+
+            _employees.SaveChanges();
         }
 
         private void IsEmployeeInDictionary(EmployeeDb employee)
@@ -89,7 +93,7 @@ namespace Services
             }
         }
 
-        public List<EmployeeDb> GetEmployees(EmployeeFilter employeeFilter)
+        public List<Employee> GetEmployees(EmployeeFilter employeeFilter)
         {
             var employeeList = new List<Employee>();
 
@@ -122,7 +126,7 @@ namespace Services
                 query = query.Where(x => x.Id == employeeFilter.Id);
             }
 
-            var employeeDb = new List<EmployeeDb>();
+            var employee = new List<Employee>();
 
             var config = new MapperConfiguration(cfg => cfg.CreateMap<EmployeeDb, Employee>());
 
@@ -130,10 +134,10 @@ namespace Services
 
             foreach (var item in query)
             {
-                employeeDb.Add(mapper.Map<EmployeeDb>(item));
+                employee.Add(mapper.Map<Employee>(item));
             }
 
-            return employeeDb;
+            return employee;
         }
     }
 }
