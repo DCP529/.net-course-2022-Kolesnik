@@ -16,6 +16,7 @@ namespace Models.ModelsDb
         [Column("amount")]
         public int Amount { get; set; }
 
+        [ForeignKey("client_id")]
         [Column("client_id")]
         public Guid ClientId { get; set; }
 
