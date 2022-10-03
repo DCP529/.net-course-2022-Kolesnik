@@ -13,7 +13,7 @@ namespace Services.Filters
         public int Passport { get; set; }
         public string Contract { get; set; }
         public decimal Salary { get; set; }
-
+        public Guid Id { get; set; }
         public Tuple<DateTime, DateTime> BirthDayRange { get; set; }
     }
 }
