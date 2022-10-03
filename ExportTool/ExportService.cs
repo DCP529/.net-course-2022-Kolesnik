@@ -102,7 +102,7 @@ namespace ExportTool
 
         public void DataExportClientList(List<Client> clients)
         {
-            DirectoryInfo directory = new DirectoryInfo("C:\\Users\\37377\\source\\repos\\.net-course-2022-Kolesnik\\ExportFiles"); 
+            DirectoryInfo directory = new DirectoryInfo("C:\\Users\\37377\\source\\repos\\.net-course-2022-Kolesnik\\ExportFiles");
 
             string fullPath = Path.Combine(directory.FullName, "ClientList");
 
