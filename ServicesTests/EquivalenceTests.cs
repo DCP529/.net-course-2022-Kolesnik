@@ -3,6 +3,7 @@ using Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Models.ModelsDb;
 using Xunit;
 
 namespace ServicesTests

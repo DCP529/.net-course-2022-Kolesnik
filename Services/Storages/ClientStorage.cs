@@ -1,9 +1,9 @@
-﻿using Models;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using Services.Storage;
+using Models.ModelsDb;
+using Models;
+using System.Collections.Generic;
 
 namespace Services
 {
@@ -17,7 +17,7 @@ namespace Services
         }
 
         public void Add(Client client)
-        {            
+        {
             var accountList = new List<Account> { new Account()
             {
                 Currency = new Currency()
