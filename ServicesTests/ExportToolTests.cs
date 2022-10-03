@@ -1,5 +1,7 @@
 ﻿using ExportTool;
 using Models;
+using Models.ModelsDb;
+using Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,8 +45,15 @@ namespace ServicesTests
             //Arrange
             var exportData = new ExportService();
 
+            var clientService = new ClientService(new BankDbContext());
+
             //Act/Assert
-            exportData.DataExportToDatabase();
+            var clientListCsv = exportData.DataExportToDatabase();
+
+            foreach (var item in clientListCsv)
+            {
+                clientService.AddClient(item);
+            }            
         }
     }
 }
