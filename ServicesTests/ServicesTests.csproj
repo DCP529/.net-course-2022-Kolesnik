@@ -27,7 +27,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ExportTool\ExportTool.csproj" />
     <ProjectReference Include="..\Models\Models.csproj" />
+    <ProjectReference Include="..\PracticeWithTypes\PracticeWithTypes.csproj" />
     <ProjectReference Include="..\Services\Services.csproj" />
   </ItemGroup>
 
