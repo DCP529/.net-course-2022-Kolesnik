@@ -11,15 +11,11 @@ namespace ExportTool
 {
     public class ExportService
     {
-        public void DataExportToFile<T>(T person) where T : Person
-        {
-            DirectoryInfo directory = new DirectoryInfo("C:\\Users\\37377\\source\\repos\\.net-course-2022-Kolesnik\\ExportFiles");
-
+        public void DataExportToFile<T>(T person, string path) where T : Person
+        {           
             if (person is Client)
             {
-                string fullPath = Path.Combine(directory.FullName, "Client");
-
-                using (FileStream fs = new FileStream(fullPath, FileMode.OpenOrCreate))
+                using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate))
                 {
                     using (StreamWriter sw = new StreamWriter(fs))
                     {
@@ -33,9 +29,7 @@ namespace ExportTool
             }
             else
             {
-                string fullPath = Path.Combine(directory.FullName, "Employee");
-
-                using (FileStream fs = new FileStream(fullPath, FileMode.OpenOrCreate))
+                using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate))
                 {
                     using (StreamWriter sw = new StreamWriter(fs))
                     {
@@ -49,13 +43,9 @@ namespace ExportTool
             }
         }
 
-        public void DataExportClientList(List<Client> clients)
+        public void DataExportClientList(List<Client> clients, string path)
         {
-            DirectoryInfo directory = new DirectoryInfo("C:\\Users\\37377\\source\\repos\\.net-course-2022-Kolesnik\\ExportFiles");
-
-            string fullPath = Path.Combine(directory.FullName, "ClientList");
-
-            using (FileStream fs = new FileStream(fullPath, FileMode.OpenOrCreate))
+            using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate))
             {
                 using (StreamWriter sw = new StreamWriter(fs))
                 {

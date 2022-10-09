@@ -23,8 +23,8 @@ namespace ServicesTests
             var exportData = new ExportService();
 
             //Act/Assert
-            exportData.DataExportToFile(client);
-            exportData.DataExportToFile(employee);
+            exportData.DataExportToFile(client, @"C:\Users\37377\source\repos\.net-course-2022-Kolesnik\ExportFiles\\Client");
+            exportData.DataExportToFile(employee, @"C:\Users\37377\source\repos\.net-course-2022-Kolesnik\ExportFiles\\Employee");
         }
 
         [Fact]
@@ -36,7 +36,8 @@ namespace ServicesTests
             var exportData = new ExportService();
 
             //Act/Assert
-            exportData.DataExportClientList(client);
+            exportData.DataExportClientList(client,
+                @"C:\Users\37377\source\repos\.net-course-2022-Kolesnik\ExportFiles\\ClientList");
         }
 
         [Fact]
