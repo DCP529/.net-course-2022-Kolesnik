@@ -20,11 +20,9 @@ namespace Services
         {
             var accountList = new List<Account> { new Account()
             {
-                Currency = new Currency()
-                {
-                    Code = 1,
-                    Name = "USD"
-                }
+                CurrencyName = "USD",
+                Amount = 0,
+                ClientId = client.Id
             } };
 
             Data.Add(client, accountList);
@@ -53,7 +51,7 @@ namespace Services
         public void UpdateAccount(Client item, Account account)
         {
             var result = Data.FirstOrDefault(x => x.Value
-                .Find(x => x.Currency.Code == account.Currency.Code).Currency.Code == account.Currency.Code);
+                .Find(x => x.ClientId == account.ClientId).ClientId == account.ClientId);
 
             result.Value[1] = account;
         }

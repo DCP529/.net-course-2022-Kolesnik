@@ -35,7 +35,7 @@ namespace Models.ModelsDb
 
         [Column("bonus")]
         public int Bonus { get; set; }
-
+        
         public ICollection<AccountDb> Accounts { get; set; }
     }
 }
