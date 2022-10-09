@@ -80,7 +80,7 @@ namespace ServicesTests
 
             var clientService = new ClientService(new BankDbContext());
 
-            var path = Path.Combine("C:\\Users\\37377\\source\\repos\\.net-course-2022-Kolesnik\\ExportFiles");
+            var path = @"C:\\Users\\37377\\source\\repos\\.net-course-2022-Kolesnik\\ExportFiles";
 
             var locker = new object();
 
