@@ -60,19 +60,23 @@ namespace Services
                                          x.BirthDate <= clientFilters.BirthDayRange.Item2);
             }
 
-            var clientConfig = new MapperConfiguration(cfg => cfg.CreateMap<ClientDb, Client>());
+            query.ToList();
 
-            var accountConfig = new MapperConfiguration(cfg => cfg.CreateMap<AccountDb, Account>());
+            var clientConfig = new MapperConfiguration(cfg =>  cfg.CreateMap<ClientDb, Client>());
 
             var clientMapper = new Mapper(clientConfig);
 
+            var accountConfig = new MapperConfiguration(cfg => cfg.CreateMap<AccountDb, Account>());
+
             var accountMapper = new Mapper(accountConfig);
 
-            var accounts = new List<AccountDb>();
+            list.AddRange(clientMapper.Map<List<Client>>(query));
 
-            foreach (var item in query)
+            foreach (var item in list)
             {
-                list.Add(clientMapper.Map<Client>(item));
+                var accounts = _clients.Accounts.Where(x => x.ClientId == item.Id).ToList();
+
+                item.Accounts.AddRange(accountMapper.Map<List<Account>>(accounts));
             }
 
             return list;
@@ -137,18 +141,22 @@ namespace Services
 
         public void UpdateAccount(Guid clientId, Account account) 
         {
-            var accountConfig = new MapperConfiguration(cfg => cfg.CreateMap<AccountDb, Account>());
+            var accountConfig = new MapperConfiguration(cfg => cfg.CreateMap<Account, AccountDb>()
+            .ForMember(x => x.Client, f => new Client() 
+            { 
+                Id = clientId
+            }
+            ));
 
             var accountMapper = new Mapper(accountConfig);
 
             var accountDb = accountMapper.Map<AccountDb>(account);
-            accountDb.Id = clientId;
 
             IsAccountInDatabase(accountDb);
 
             var getAccount = _clients.Accounts.FirstOrDefault(x => x.ClientId == clientId);
 
-            _clients.Entry(getAccount).CurrentValues.SetValues(accountDb);
+            _clients.Entry(getAccount).State = EntityState.Detached;
 
             _clients.Accounts.Update(accountDb);
 

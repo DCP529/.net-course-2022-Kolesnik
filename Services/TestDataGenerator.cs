@@ -96,7 +96,7 @@ namespace Services
             Faker<Account> generatorAccount = new Faker<Account>()
             .StrictMode(true)
             .RuleFor(x => x.Amount, c => c.Random.Int(1, 1000))
-            .RuleFor(x => x.Currency, c => currency);
+            .RuleFor(x => x.CurrencyName, c => currency.Name);
 
             for (int i = 0; i <= 999; i++)
             {
