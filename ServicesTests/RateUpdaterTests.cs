@@ -37,14 +37,13 @@ namespace ServicesTests
 
             var tasks = new Task(() =>
             {
-                var updater = new RateUpdater(new ClientService(new BankDbContext()));
+                    var updater = new RateUpdater(new ClientService(new BankDbContext()));
 
-                var task = updater.UpdateAmountAccount(cancelTokenSource);
+                    var task = updater.UpdateAmountAccount(cancelTokenSource);
             });
 
             tasks.Start();
-
-            Task.Delay(2000).Wait();
+            
 
             cancelTokenSource.Cancel();
             //Assert
