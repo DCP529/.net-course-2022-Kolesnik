@@ -36,7 +36,7 @@ namespace ServicesTests
             var whereClientFilter = clientService.GetClients(new ClientFilter()
             {
                 BirthDayRange = new Tuple<DateTime, DateTime>(DateTime.Parse("01.01.1922"), DateTime.Parse("31.12.2004")),
-            });
+            }).Result;
 
             var orderByFilter = whereClientFilter.OrderBy(x => x.Phone);
 
@@ -68,17 +68,17 @@ namespace ServicesTests
 
             //Act
 
-            clientService.AddClient(client);
+            clientService.AddClient(client).Wait();
 
             client.FirstName = "Станислав";
 
-            clientService.Update(Guid.Parse("4c233c84-d0c6-4ff9-bb6b-dfbd517be79c"), client);
+            clientService.Update(Guid.Parse("4c233c84-d0c6-4ff9-bb6b-dfbd517be79c"), client).Wait();
 
-            var updateClient = clientService.GetClientById(Guid.Parse("4c233c84-d0c6-4ff9-bb6b-dfbd517be79c"));
+            var updateClient = clientService.GetClientById(Guid.Parse("4c233c84-d0c6-4ff9-bb6b-dfbd517be79c")).Result;
 
-            clientService.Update(Guid.Parse("4c233c84-d0c6-4ff9-bb6b-dfbd517be79c"), client);
+            clientService.Update(Guid.Parse("4c233c84-d0c6-4ff9-bb6b-dfbd517be79c"), client).Wait();
 
-            updateClient = clientService.GetClientById(Guid.Parse("4c233c84-d0c6-4ff9-bb6b-dfbd517be79c"));
+            updateClient = clientService.GetClientById(Guid.Parse("4c233c84-d0c6-4ff9-bb6b-dfbd517be79c")).Result;
 
             //Assert
             Assert.Equal(client.Passport, updateClient.Passport);
@@ -94,7 +94,7 @@ namespace ServicesTests
             var clients = clientService.GetClients(new ClientFilter()
             {
                 Passport = 1
-            });
+            }).Result;
 
             //Act
             
@@ -103,7 +103,7 @@ namespace ServicesTests
             var deletedClient = clientService.GetClients(new ClientFilter()
             {
                 Passport = 1
-            });
+            }).Result;
 
             //Assert
             Assert.Equal(deletedClient.Count, clients.Count - 1);

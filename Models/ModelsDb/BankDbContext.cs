@@ -13,6 +13,7 @@ namespace Models.ModelsDb
         public DbSet<AccountDb> Accounts { get; set; }
         public DbSet<EmployeeDb> Employees { get; set; }
         public DbSet<ClientDb> Clients { get; set; }
+        public DbSet<CurrencyDb> Currency { get; set; }
 
         public BankDbContext()
         {

@@ -14,7 +14,7 @@ namespace ServicesTests
     public class ExportToolTests
     {
         [Fact]
-        public void Data_Export_To_FileTests()
+        public async void Data_Export_To_FileTests()
         {
             //Arrange
             var client = new Client() { FirstName = "Gin", Passport = 20 };
@@ -23,12 +23,12 @@ namespace ServicesTests
             var exportData = new ExportService();
 
             //Act/Assert
-            exportData.DataExportToFile(client, @"C:\Users\37377\source\repos\.net-course-2022-Kolesnik\ExportFiles\\Client");
-            exportData.DataExportToFile(employee, @"C:\Users\37377\source\repos\.net-course-2022-Kolesnik\ExportFiles\\Employee");
+            await exportData.DataExportToFileAsync(client, @"C:\Users\37377\source\repos\.net-course-2022-Kolesnik\ExportFiles\\Client");
+            await exportData.DataExportToFileAsync(employee, @"C:\Users\37377\source\repos\.net-course-2022-Kolesnik\ExportFiles\\Employee");
         }
 
         [Fact]
-        public void Data_Export_ClientList_FileTests()
+        public async void Data_Export_ClientList_FileTests()
         {
             //Arrange
             var client = new List<Client>() { new Client() { FirstName = "Mark" , Passport = 20}, new Client() { FirstName = "Oleg" , Passport = 20 } };
@@ -36,7 +36,7 @@ namespace ServicesTests
             var exportData = new ExportService();
 
             //Act/Assert
-            exportData.DataExportClientList(client,
+            await exportData.DataExportClientListAsync(client,
                 @"C:\Users\37377\source\repos\.net-course-2022-Kolesnik\ExportFiles\\ClientList");
         }
 
@@ -49,11 +49,11 @@ namespace ServicesTests
             var clientService = new ClientService(new BankDbContext());
 
             //Act/Assert
-            var clientListCsv = exportData.DataExportToDatabase();
+            var clientListCsv = exportData.DataExportToDatabaseAsync();
 
-            foreach (var item in clientListCsv)
+            foreach (var item in clientListCsv.Result)
             {
-                clientService.AddClient(item);
+                clientService.AddClientAsync(item);
             }            
         }
     }

@@ -1,4 +1,5 @@
-﻿using Bogus;
+﻿using AutoMapper;
+using Bogus;
 using ExportTool;
 using Models;
 using Models.ModelsDb;
@@ -33,7 +34,7 @@ namespace ServicesTests
             //Arange
             var clientService = new ClientService(new BankDbContext());
 
-            var account = new Account() { Amount = 0, Currency = new Currency() };
+            var account = new Account() { Amount = 0, CurrencyName = "USD" };
 
             var locker = new object();
 
@@ -72,7 +73,7 @@ namespace ServicesTests
         }
 
         [Fact]
-        public void Paralel_Import_And_ExportTests()
+        public async void Paralel_Import_And_ExportTests()
         {
             //Arange
 
@@ -84,7 +85,7 @@ namespace ServicesTests
 
             //Act
 
-            var clientCsvList = export.DataExportToDatabase();
+            var clientCsvList = export.DataExportToDatabaseAsync().Result;
 
 
             Thread importThread = new(() =>
@@ -93,7 +94,7 @@ namespace ServicesTests
 
                 foreach (var item in clientCsvList)
                 {
-                    clientService.AddClient(item);
+                    clientService.AddClientAsync(item);
 
                     _output1.WriteLine($"Поток {Thread.CurrentThread.Name} добавляет клиента в бд из файла");
 
@@ -106,8 +107,8 @@ namespace ServicesTests
             {
                 clientService = new ClientService(new BankDbContext());
 
-                export.DataExportClientList(clientService.GetClients(new ClientFilter() { Passport = 5 }),
-                    @"C:\Users\37377\source\repos\.net-course-2022-Kolesnik\ExportFiles\\ClientFromDatabase");
+                Task task = export.DataExportClientListAsync(clientService.GetClientsAsync(new ClientFilter() { Passport = 5 }).Result,
+                   @"C:\Users\37377\source\repos\.net-course-2022-Kolesnik\ExportFiles\\ClientFromDatabase");
 
                 _output1.WriteLine($"Поток {Thread.CurrentThread.Name} записывает клиента из бд в файл");
             });
