@@ -1,9 +1,13 @@
-﻿using System;
+﻿using Models.ModelsDb;
+using System;
+using System.Collections.Generic;
 
 namespace Models
 {
     public class Client : Person
     {
+        public List<Account> Accounts { get; set; }
+
         public override bool Equals(object obj)
         {
             if (obj is null)
