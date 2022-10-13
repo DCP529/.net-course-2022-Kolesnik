@@ -76,13 +76,11 @@ namespace ServicesTests
         {
             //Arange
 
+            ClientService clientService;
+
             var export = new ExportService();
 
-            var clientService = new ClientService(new BankDbContext());
-
             var path = @"C:\\Users\\37377\\source\\repos\\.net-course-2022-Kolesnik\\ExportFiles";
-
-            var locker = new object();
 
             //Act
 
@@ -91,15 +89,14 @@ namespace ServicesTests
 
             Thread importThread = new(() =>
             {
-                lock (locker)
+                clientService = new ClientService(new BankDbContext());
+
+                foreach (var item in clientCsvList)
                 {
-                    foreach (var item in clientCsvList)
-                    {
-                        clientService.AddClient(item);
+                    clientService.AddClient(item);
 
-                        _output1.WriteLine($"Поток {Thread.CurrentThread.Name} добавляет клиента в бд из файла");
+                    _output1.WriteLine($"Поток {Thread.CurrentThread.Name} добавляет клиента в бд из файла");
 
-                    }
                 }
             });
 
@@ -107,15 +104,13 @@ namespace ServicesTests
 
             Thread exportThread = new(() =>
             {
-                lock (locker)
-                {
-                    export.DataExportClientList(clientService.GetClients(new ClientFilter() { Passport = 5 }),
-                        @"C:\Users\37377\source\repos\.net-course-2022-Kolesnik\ExportFiles\\ClientFromDatabase");
+                clientService = new ClientService(new BankDbContext());
 
-                    _output1.WriteLine($"Поток {Thread.CurrentThread.Name} записывает клиента из бд в файл");
-                }
-            }
-            );
+                export.DataExportClientList(clientService.GetClients(new ClientFilter() { Passport = 5 }),
+                    @"C:\Users\37377\source\repos\.net-course-2022-Kolesnik\ExportFiles\\ClientFromDatabase");
+
+                _output1.WriteLine($"Поток {Thread.CurrentThread.Name} записывает клиента из бд в файл");
+            });
 
             exportThread.Start();
 
