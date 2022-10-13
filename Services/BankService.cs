@@ -1,7 +1,7 @@
 ﻿using Models;
 using System;
 using System.Collections.Generic;
-
+using System.Threading.Tasks;
 
 namespace Services
 {
@@ -34,14 +34,14 @@ namespace Services
             person.Bonus += 1;
         }
 
-        public void AddToBlackList<T>(T person) where T : Person
+        public async Task AddToBlackListAsync<T>(T person) where T : Person
         {
-            BlackList.Add(person);
+            await Task.Run(() =>BlackList.Add(person));
         }
 
-        public bool IsPersonInBlackList<T>(T person) where T : Person
+        public async Task<bool> IsPersonInBlackListAsync<T>(T person) where T : Person
         {
-            return BlackList.Contains(person);
+            return await Task.Run(() =>BlackList.Contains(person));
         }
     }
 }

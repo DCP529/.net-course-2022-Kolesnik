@@ -11,65 +11,65 @@ namespace ExportTool
 {
     public class ExportService
     {
-        public void DataExportToFile<T>(T person, string path) where T : Person
-        {           
+        public async Task DataExportToFileAsync<T>(T person, string path) where T : Person
+        {
             if (person is Client)
             {
-                using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate))
+                await using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate))
                 {
-                    using (StreamWriter sw = new StreamWriter(fs))
+                    await using (StreamWriter sw = new StreamWriter(fs))
                     {
-                        using (CsvWriter csv = new CsvWriter(sw, CultureInfo.CurrentCulture))
+                        await using (CsvWriter csv = new CsvWriter(sw, CultureInfo.CurrentCulture))
                         {
-                            csv.WriteRecord(person);
-                            csv.Flush();
+                            await Task.Run(() => csv.WriteRecord(person));
+                            await csv.FlushAsync();
                         }
                     }
                 }
             }
             else
             {
-                using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate))
+                await using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate))
                 {
-                    using (StreamWriter sw = new StreamWriter(fs))
+                    await using (StreamWriter sw = new StreamWriter(fs))
                     {
-                        using (CsvWriter csv = new CsvWriter(sw, CultureInfo.CurrentCulture))
+                        await using (CsvWriter csv = new CsvWriter(sw, CultureInfo.CurrentCulture))
                         {
-                            csv.WriteRecord(person);
-                            csv.Flush();
+                            await Task.Run(() => csv.WriteRecord(person));
+                            await csv.FlushAsync();
                         }
                     }
                 }
             }
         }
 
-        public void DataExportClientList(List<Client> clients, string path)
+        public async Task DataExportClientListAsync(List<Client> clients, string path)
         {
-            using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate))
+            await using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate))
             {
-                using (StreamWriter sw = new StreamWriter(fs))
+                await using (StreamWriter sw = new StreamWriter(fs))
                 {
-                    using (CsvWriter csv = new CsvWriter(sw, CultureInfo.CurrentCulture))
+                    await using (CsvWriter csv = new CsvWriter(sw, CultureInfo.CurrentCulture))
                     {
-                        csv.WriteRecords(clients);
-                        csv.Flush();
+                        await csv.WriteRecordsAsync(clients);
+                        await csv.FlushAsync();
                     }
                 }
 
             }
         }
 
-        public List<Client> DataExportToDatabase()
+        public async Task<List<Client>> DataExportToDatabaseAsync()
         {
-            string path = Path.Combine("C:\\Users\\37377\\source\\repos\\.net-course-2022-Kolesnik\\ExportFiles", "ClientList"); 
+            string path = Path.Combine("C:\\Users\\37377\\source\\repos\\.net-course-2022-Kolesnik\\ExportFiles", "ClientList");
 
-            using (FileStream fs = new FileStream(path, FileMode.Open))
+            await using (FileStream fs = new FileStream(path, FileMode.Open))
             {
                 using (StreamReader sr = new StreamReader(fs))
                 {
-                    using (var reader = new CsvReader(sr, CultureInfo.CurrentCulture))
+                    using (CsvReader reader = new CsvReader(sr, CultureInfo.CurrentCulture))
                     {
-                        return reader.GetRecords<Client>().ToList();                        
+                        return await Task.Run(() => (List<Client>)reader.GetRecordsAsync<List<Client>>());
                     }
                 }
             }

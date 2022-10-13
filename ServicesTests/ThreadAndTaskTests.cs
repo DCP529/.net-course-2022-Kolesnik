@@ -1,4 +1,5 @@
-﻿using Bogus;
+﻿using AutoMapper;
+using Bogus;
 using ExportTool;
 using Models;
 using Models.ModelsDb;
@@ -33,7 +34,7 @@ namespace ServicesTests
             //Arange
             var clientService = new ClientService(new BankDbContext());
 
-            var account = new Account() { Amount = 0, Currency = new Currency() };
+            var account = new Account() { Amount = 0, CurrencyName = "USD" };
 
             var locker = new object();
 

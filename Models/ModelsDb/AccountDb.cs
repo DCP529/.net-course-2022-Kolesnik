@@ -21,6 +21,6 @@ namespace Models.ModelsDb
         public Guid ClientId { get; set; }
 
 
-        public ClientDb Client { get; set; }
+        public ClientDb Client { get; set; } 
     }
 }
