@@ -22,29 +22,29 @@ namespace Services
             _employees = employeeStorage;
         }
 
-        public Task AddEmployee(Employee employee)
+        public async void AddEmployeeAsync(Employee employee)
         {
-            return Task.Run(() =>
+            var employeeDb = new EmployeeDb();
+
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Employee, EmployeeDb>());
+
+            var mapper = new Mapper(config);
+
+            employeeDb = mapper.Map<EmployeeDb>(employee);
+            employeeDb.Id = Guid.NewGuid();
+
+            if (employee.BirthDate > DateTime.Parse("31.12.2004"))
             {
-                var employeeDb = new EmployeeDb();
+                throw new AgeLimitException("Возраст клиента должен быть больше 18!");
+            }
 
-                var config = new MapperConfiguration(cfg => cfg.CreateMap<Employee, EmployeeDb>());
+            if (employee.Passport == 0)
+            {
+                throw new PassportNullException("Нельзя добавить клиента без паспортных данных!");
+            }
 
-                var mapper = new Mapper(config);
-
-                employeeDb = mapper.Map<EmployeeDb>(employee);
-                employeeDb.Id = Guid.NewGuid();
-
-                if (employee.BirthDate > DateTime.Parse("31.12.2004"))
-                {
-                    throw new AgeLimitException("Возраст клиента должен быть больше 18!");
-                }
-
-                if (employee.Passport == 0)
-                {
-                    throw new PassportNullException("Нельзя добавить клиента без паспортных данных!");
-                }
-
+            await Task.Run(() =>
+            {
                 if (!_employees.Employees.Contains(employeeDb))
                 {
                     _employees.Employees.Add(employeeDb);
@@ -54,21 +54,21 @@ namespace Services
             });
         }
 
-        public Task Update(Guid employeeId, Employee employee)
+        public async Task UpdateAsync(Guid employeeId, Employee employee)
         {
-            return Task.Run(() =>
+            var employeeDb = new EmployeeDb();
+
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Employee, EmployeeDb>());
+
+            var mapper = new Mapper(config);
+
+            employeeDb = mapper.Map<EmployeeDb>(employee);
+            employeeDb.Id = employeeId;
+
+            await IsEmployeeInDictionaryAsync(employeeDb);
+
+            await Task.Run(() =>
             {
-                var employeeDb = new EmployeeDb();
-
-                var config = new MapperConfiguration(cfg => cfg.CreateMap<Employee, EmployeeDb>());
-
-                var mapper = new Mapper(config);
-
-                employeeDb = mapper.Map<EmployeeDb>(employee);
-                employeeDb.Id = employeeId;
-
-                IsEmployeeInDictionary(employeeDb);
-
                 if (_employees.Employees.FirstOrDefault(x => x.Id == employeeId) != null)
                 {
                     var getClient = _employees.Employees.FirstOrDefault(x => x.Id == employeeId);
@@ -80,24 +80,23 @@ namespace Services
             });
         }
 
-        public Task Delete(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
-            return Task.Run(() =>
+            var employee = await _employees.Employees.FirstOrDefaultAsync(x => x.Id == id);
+
+            await IsEmployeeInDictionaryAsync(employee);
+
+            await Task.Run(() =>
             {
-                var employee = _employees.Employees.FirstOrDefault(x => x.Id == id);
-
-                IsEmployeeInDictionary(employee);
-
-
                 _employees.Employees.Remove(employee);
 
                 _employees.SaveChanges();
             });
         }
 
-        private void IsEmployeeInDictionary(EmployeeDb employee)
+        private async Task IsEmployeeInDictionaryAsync(EmployeeDb employee)
         {
-            var findEmployee = _employees.Employees.FirstOrDefault(x => x.Id == employee.Id);
+            var findEmployee = await _employees.Employees.FirstOrDefaultAsync(x => x.Id == employee.Id);
 
             if (!_employees.Employees.Contains(findEmployee))
             {
@@ -105,15 +104,14 @@ namespace Services
             }
         }
 
-        public Task<List<Employee>> GetEmployees(EmployeeFilter employeeFilter)
+        public async Task<List<Employee>> GetEmployees(EmployeeFilter employeeFilter)
         {
-            return Task.Run(() =>
+            var employeeList = new List<Employee>();
+
+            IQueryable<EmployeeDb> query = null;
+
+            await Task.Run(() =>
             {
-                var employeeList = new List<Employee>();
-
-                IQueryable<EmployeeDb> query = null;
-
-
                 query = _employees.Employees.Select(t => t);
 
                 if (employeeFilter.FirstName != null && employeeFilter.LastName != null && employeeFilter.Patronymic != null)
@@ -127,7 +125,6 @@ namespace Services
                 {
                     query = query.Where(x => x.Passport == employeeFilter.Passport);
                 }
-
                 if (employeeFilter.Phone != 0)
                 {
                     query = query.Where(x => x.Phone == employeeFilter.Phone);
@@ -142,19 +139,21 @@ namespace Services
                 {
                     query = query.Where(x => x.Id == employeeFilter.Id);
                 }
+            });
+            var employee = new List<Employee>();
 
-                var employee = new List<Employee>();
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<EmployeeDb, Employee>());
 
-                var config = new MapperConfiguration(cfg => cfg.CreateMap<EmployeeDb, Employee>());
+            var mapper = new Mapper(config);
 
-                var mapper = new Mapper(config);
-
+            await Task.Run(() =>
+            {
                 foreach (var item in query)
                 {
                     employee.Add(mapper.Map<Employee>(item));
                 }
-                return employee;
             });
+            return employee;
         }
     }
 }

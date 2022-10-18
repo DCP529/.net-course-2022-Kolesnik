@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Services.Storage;
 using Services.Filters;
 using Models;
 using Models.ModelsDb;
+using Bogus.DataSets;
 using System.Threading.Tasks;
 
 namespace Services
@@ -20,26 +22,25 @@ namespace Services
             _clients = clientStorage;
         }
 
-        public Task<Client> GetClientById(Guid clientId)
+        public async Task<Client> GetClientByIdAsync(Guid clientId)
         {
-            return Task.Run(() =>
-            {
-                IsClientInDatabase(_clients.Clients.FirstOrDefault(x => x.Id == clientId));
+            await IsClientInDatabaseAsync(_clients.Clients.FirstOrDefault(x => x.Id == clientId));
 
-                var clientConfig = new MapperConfiguration(cfg => cfg.CreateMap<ClientDb, Client>());
-                var clientMapper = new Mapper(clientConfig);
+            var clientConfig = new MapperConfiguration(cfg => cfg.CreateMap<ClientDb, Client>());
+            var clientMapper = new Mapper(clientConfig);
 
-                return clientMapper.Map<Client>(_clients.Clients.FirstOrDefault(x => x.Id == clientId));
-            });
+            return await Task.Run(() => clientMapper.Map<Client>(_clients.Clients.FirstOrDefault(x => x.Id == clientId)));
         }
 
-        public Task<List<Client>> GetClients(ClientFilter clientFilters)
+        public async Task<List<Client>> GetClientsAsync(ClientFilter clientFilters)
         {
-            return Task.Run(() =>
-            {
-                var list = new List<Client>();
+            var list = new List<Client>();
 
-                IQueryable<ClientDb> query = _clients.Clients.Select(t => t);
+            IQueryable<ClientDb> query = null;
+
+            await Task.Run(() =>
+            {
+                query = _clients.Clients.Select(t => t);
 
                 if (clientFilters.FirstName != null && clientFilters.LastName != null && clientFilters.Patronymic != null)
                 {
@@ -64,16 +65,21 @@ namespace Services
                                              x.BirthDate <= clientFilters.BirthDayRange.Item2);
                 }
 
-                var clientConfig = new MapperConfiguration(cfg => cfg.CreateMap<ClientDb, Client>());
-
-                var clientMapper = new Mapper(clientConfig);
-
-                var accountConfig = new MapperConfiguration(cfg => cfg.CreateMap<AccountDb, Account>());
-
-                var accountMapper = new Mapper(accountConfig);
+                query.ToList();
+            });
 
 
-                list.AddRange(clientMapper.Map<List<Client>>(query.ToList()));
+            var clientConfig = new MapperConfiguration(cfg => cfg.CreateMap<ClientDb, Client>());
+
+            var clientMapper = new Mapper(clientConfig);
+
+            var accountConfig = new MapperConfiguration(cfg => cfg.CreateMap<AccountDb, Account>());
+
+            var accountMapper = new Mapper(accountConfig);
+
+            await Task.Run(() =>
+            {
+                list.AddRange(clientMapper.Map<List<Client>>(query));
 
                 foreach (var item in list)
                 {
@@ -81,16 +87,14 @@ namespace Services
 
                     item.Accounts.AddRange(accountMapper.Map<List<Account>>(accounts));
                 }
-
-                return list;
             });
+
+            return list;
         }
 
-        public Task Update(Guid id, Client client)
+        public async Task UpdateAsync(Guid id, Client client)
         {
-            return Task.Run(() =>
-            {
-                var clientConfig = new MapperConfiguration(cfg => cfg.CreateMap<Client, ClientDb>()
+            var clientConfig = new MapperConfiguration(cfg => cfg.CreateMap<Client, ClientDb>()
                 .ForMember(x => x.Accounts, f => new AccountDb()
                 {
                     CurrencyName = "USD",
@@ -98,100 +102,98 @@ namespace Services
                     ClientId = id
                 }));
 
-                var clientMapper = new Mapper(clientConfig);
+            var clientMapper = new Mapper(clientConfig);
 
-                var clientDb = clientMapper.Map<ClientDb>(client);
-                clientDb.Id = id;
+            var clientDb = clientMapper.Map<ClientDb>(client);
+            clientDb.Id = id;
 
+            await Task.Run(() =>
+            {
                 if (_clients.Clients.FirstOrDefault(x => x.Id == id) != null)
                 {
                     var getClient = _clients.Clients.FirstOrDefault(x => x.Id == id);
 
                     _clients.Entry(getClient).CurrentValues.SetValues(clientDb);
 
-                    _clients.SaveChangesAsync();
+                    _clients.SaveChanges();
                 }
             });
         }
-
-        public Task Delete(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
-            return Task.Run(() =>
+            var client = await _clients.Clients.FirstOrDefaultAsync(x => x.Id == id);
+
+            await IsClientInDatabaseAsync(client);
+
+            _clients.Clients.Remove(client);
+
+            await _clients.SaveChangesAsync();
+        }
+
+        public async Task AddAccountAsync(Guid clientId, Account account)
+        {
+            var client = await _clients.Clients.FirstOrDefaultAsync(x => x.Id == clientId);
+
+            await IsClientInDatabaseAsync(client);
+
+            var accountConfig = new MapperConfiguration(cfg => cfg.CreateMap<AccountDb, Account>());
+
+            var accountMapper = new Mapper(accountConfig);
+
+            var accountDb = accountMapper.Map<AccountDb>(account);
+            accountDb.Id = clientId;
+
+            await IsAccountInDatabaseAsync(accountDb);
+
+            await Task.Run(() =>
             {
-                var client = _clients.Clients.FirstOrDefault(x => x.Id == id);
-
-                IsClientInDatabase(client);
-
-                _clients.Clients.Remove(client);
+                client.Accounts.Add(accountDb);
+                _clients.Accounts.Add(accountDb);
 
                 _clients.SaveChanges();
             });
         }
 
-        public Task AddAccount(Guid clientId, Account account)
+        public async Task UpdateAccountAsync(Guid clientId, Account account)
         {
-            return Task.Run(() =>
+            var accountConfig = new MapperConfiguration(cfg => cfg.CreateMap<Account, AccountDb>()
+            .ForMember(x => x.Client, f => new Client()
             {
-                var client = _clients.Clients.FirstOrDefault(x => x.Id == clientId);
+                Id = clientId
+            }
+            ));
 
-                IsClientInDatabase(client);
+            var accountMapper = new Mapper(accountConfig);
 
-                var accountConfig = new MapperConfiguration(cfg => cfg.CreateMap<AccountDb, Account>());
+            var accountDb = accountMapper.Map<AccountDb>(account);
 
-                var accountMapper = new Mapper(accountConfig);
+            await IsAccountInDatabaseAsync(accountDb);
 
-                var accountDb = accountMapper.Map<AccountDb>(account);
-                accountDb.Id = clientId;
+            var getAccount = await _clients.Accounts.FirstOrDefaultAsync(x => x.ClientId == clientId);
 
-                IsAccountInDatabase(accountDb);
-
-                client.Accounts.Add(accountDb);
-
-                _clients.Accounts.AddAsync(accountDb);
-
-                _clients.SaveChangesAsync();
-            });
-        }
-
-        public Task UpdateAccount(Guid clientId, Account account)
-        {
-            return Task.Run(() =>
+            await Task.Run(() =>
             {
-                var accountConfig = new MapperConfiguration(cfg => cfg.CreateMap<Account, AccountDb>()
-                .ForMember(x => x.Client, f => new Client()
-                {
-                    Id = clientId
-                }));
-
-                var accountMapper = new Mapper(accountConfig);
-
-                var accountDb = accountMapper.Map<AccountDb>(account);
-
-                IsAccountInDatabase(accountDb);
-
-                var getAccount = _clients.Accounts.FirstOrDefaultAsync(x => x.ClientId == clientId);
-
                 _clients.Entry(getAccount).State = EntityState.Detached;
 
                 _clients.Accounts.Update(accountDb);
 
-                _clients.SaveChangesAsync();
+                _clients.SaveChanges();
             });
         }
 
-        public Task DeleteAccount(Guid clientId, Account account)
+        public async Task DeleteAccountAsync(Guid clientId, Account account)
         {
-            return Task.Run(() =>
+            var accountConfig = new MapperConfiguration(cfg => cfg.CreateMap<AccountDb, Account>());
+
+            var accountMapper = new Mapper(accountConfig);
+
+            var accountDb = accountMapper.Map<AccountDb>(account);
+            accountDb.Id = clientId;
+
+            await IsAccountInDatabaseAsync(accountDb);
+
+            await Task.Run(() =>
             {
-                var accountConfig = new MapperConfiguration(cfg => cfg.CreateMap<AccountDb, Account>());
-
-                var accountMapper = new Mapper(accountConfig);
-
-                var accountDb = accountMapper.Map<AccountDb>(account);
-                accountDb.Id = clientId;
-
-                IsAccountInDatabase(accountDb);
-
 
                 var deleteAccount = _clients.Accounts.Where(x => x.ClientId == clientId);
 
@@ -208,9 +210,9 @@ namespace Services
             });
         }
 
-        private void IsClientInDatabase(ClientDb client)
+        private async Task IsClientInDatabaseAsync(ClientDb client)
         {
-            var clientDb = _clients.Clients.FirstOrDefault(x => x.Id == client.Id);
+            var clientDb = await _clients.Clients.FirstOrDefaultAsync(x => x.Id == client.Id);
 
             if (!_clients.Clients.Contains(clientDb))
             {
@@ -218,50 +220,50 @@ namespace Services
             }
         }
 
-        private void IsAccountInDatabase(AccountDb account)
+        private async Task IsAccountInDatabaseAsync(AccountDb account)
         {
-            if (!_clients.Accounts.Contains(_clients.Accounts.FirstOrDefault(x => x.Id == account.Id)))
+            if (!_clients.Accounts.Contains(await _clients.Accounts.FirstOrDefaultAsync(x => x.Id == account.Id)))
             {
                 throw new ArgumentException("Аккаунт не найден!");
             }
         }
 
-        public Task AddClient(Client client)
+        public async void AddClientAsync(Client client)
         {
-            return Task.Run(() =>
-            {
-                ClientDb clientDb = new ClientDb() { Id = Guid.NewGuid() };
+            ClientDb clientDb = new ClientDb() { Id = Guid.NewGuid() };
 
-                var defaultAccount = new AccountDb()
+            var defaultAccount = new AccountDb()
+            {
+                CurrencyName = "USD",
+                Amount = 0,
+                ClientId = clientDb.Id,
+                Id = Guid.NewGuid()
+            };
+            var clientConfig = new MapperConfiguration(cfg => cfg.CreateMap<Client, ClientDb>()
+                .ForMember(x => x.Accounts, f => new AccountDb()
                 {
                     CurrencyName = "USD",
                     Amount = 0,
-                    ClientId = clientDb.Id,
-                    Id = Guid.NewGuid()
-                };
+                    ClientId = clientDb.Id
+                }));
 
-                var clientConfig = new MapperConfiguration(cfg => cfg.CreateMap<Client, ClientDb>()
-                    .ForMember(x => x.Accounts, f => new AccountDb()
-                    {
-                        CurrencyName = "USD",
-                        Amount = 0,
-                        ClientId = clientDb.Id
-                    }));
+            var clientMapper = new Mapper(clientConfig);
 
-                var clientMapper = new Mapper(clientConfig);
+            clientDb = clientMapper.Map<ClientDb>(client);
+            clientDb.Id = Guid.NewGuid();
 
-                clientDb = clientMapper.Map<ClientDb>(client);
-                clientDb.Id = Guid.NewGuid();
+            if (client.BirthDate > DateTime.Parse("31.12.2004"))
+            {
+                throw new AgeLimitException("Возраст клиента должен быть больше 18!");
+            }
 
-                if (client.BirthDate > DateTime.Parse("31.12.2004"))
-                {
-                    throw new AgeLimitException("Возраст клиента должен быть больше 18!");
-                }
+            if (client.Passport == 0)
+            {
+                throw new PassportNullException("Нельзя добавить клиента без паспортных данных!");
+            }
 
-                if (client.Passport == 0)
-                {
-                    throw new PassportNullException("Нельзя добавить клиента без паспортных данных!");
-                }
+            await Task.Run(() =>
+            {
 
                 if (!_clients.Clients.Contains(clientDb))
                 {
