@@ -21,18 +21,18 @@ namespace Services
             _clientService = clientService;
         }
 
-        public Task UpdateAmountAccount(CancellationTokenSource cancellation)
+        public async Task UpdateAmountAccount(CancellationTokenSource cancellation)
         {
             return Task.Factory.StartNew(() =>
             {
                 var clients = _clientService.GetClients(new ClientFilter() { Passport = 20 }).Result;
 
-                while (!cancellation.IsCancellationRequested)
+            while (!cancellation.IsCancellationRequested)
+            {
+                foreach (var item in clients)
                 {
-                    foreach (var item in clients)
-                    {
-                        var account = item.Accounts.FirstOrDefault(x => x.CurrencyName == "USD");
-                        account.Amount += Convert.ToInt32(account.Amount * 0.3);
+                    var account = item.Accounts.FirstOrDefault(x => x.CurrencyName == "USD");
+                    account.Amount += Convert.ToInt32(account.Amount * 0.3);
 
                         var task = _clientService.UpdateAccount(item.Id, new Account()
                         {

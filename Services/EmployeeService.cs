@@ -95,9 +95,9 @@ namespace Services
             });
         }
 
-        private void IsEmployeeInDictionary(EmployeeDb employee)
+        private async Task IsEmployeeInDictionaryAsync(EmployeeDb employee)
         {
-            var findEmployee = _employees.Employees.FirstOrDefault(x => x.Id == employee.Id);
+            var findEmployee = await _employees.Employees.FirstOrDefaultAsync(x => x.Id == employee.Id);
 
             if (!_employees.Employees.Contains(findEmployee))
             {

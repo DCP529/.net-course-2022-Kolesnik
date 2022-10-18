@@ -14,18 +14,16 @@ namespace Services
 {
     public class CashDispenserService
     {
-        public Task CashingOut(Client client)
+        public async Task CashingOutAsync(Client client)
         {
-            return Task.Factory.StartNew(() =>
+            var clientService = new ClientService(new BankDbContext());
+
+            var account = await Task.Run(() => client.Accounts.FirstOrDefault(x => x.CurrencyName == "USD"));
+
+            if (account.Amount >= 100)
             {
-                var clientService = new ClientService(new BankDbContext());
-
-                var account = client.Accounts.FirstOrDefault(x => x.CurrencyName == "USD");
-
-                if (account.Amount >= 100)
-                {
-                    account.Amount -= 100;
-                }
+                account.Amount -= 100;
+            }
 
                 clientService.UpdateAccountAsync(client.Id, new Account()
                 {
