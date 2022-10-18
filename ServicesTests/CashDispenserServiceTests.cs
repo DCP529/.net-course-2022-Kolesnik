@@ -32,7 +32,7 @@ namespace ServicesTests
 
             //Act
 
-            var clients = clientService.GetClientsAsync(new ClientFilter()
+            var clients = clientService.GetClients(new ClientFilter()
             {
                 Passport = 20
             });

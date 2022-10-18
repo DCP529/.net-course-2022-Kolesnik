@@ -16,23 +16,25 @@ namespace Services
     {
         public Task CashingOut(Client client)
         {
-
-            var clientService = new ClientService(new BankDbContext());
-
-            var account = client.Accounts.FirstOrDefault(x => x.CurrencyName == "USD"));
-
-            if (account.Amount >= 100)
+            return Task.Run(() =>
             {
-                account.Amount -= 100;
-            }
+                var clientService = new ClientService(new BankDbContext());
 
-            clientService.UpdateAccount(client.Id, new Account()
-            {
-                Amount = account.Amount,
-                CurrencyName = account.CurrencyName,
-                ClientId = account.ClientId,
-                Id = account.Id
-            }).Wait();
+                var account = client.Accounts.FirstOrDefault(x => x.CurrencyName == "USD");
+
+                if (account.Amount >= 100)
+                {
+                    account.Amount -= 100;
+                }
+
+                clientService.UpdateAccount(client.Id, new Account()
+                {
+                    Amount = account.Amount,
+                    CurrencyName = account.CurrencyName,
+                    ClientId = account.ClientId,
+                    Id = account.Id
+                }).Wait();
+            });
         }
     }
 }

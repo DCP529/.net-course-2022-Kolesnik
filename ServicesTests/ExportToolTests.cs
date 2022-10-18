@@ -53,7 +53,7 @@ namespace ServicesTests
 
             foreach (var item in clientListCsv.Result)
             {
-                clientService.AddClientAsync(item);
+                clientService.AddClient(item);
             }            
         }
     }
