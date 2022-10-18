@@ -208,9 +208,9 @@ namespace Services
             });
         }
 
-        private async Task IsClientInDatabaseAsync(ClientDb client)
+        private void IsClientInDatabase(ClientDb client)
         {
-            var clientDb = await _clients.Clients.FirstOrDefaultAsync(x => x.Id == client.Id);
+            var clientDb = _clients.Clients.FirstOrDefault(x => x.Id == client.Id);
 
             if (!_clients.Clients.Contains(clientDb))
             {
@@ -218,9 +218,9 @@ namespace Services
             }
         }
 
-        private async Task IsAccountInDatabaseAsync(AccountDb account)
+        private void IsAccountInDatabase(AccountDb account)
         {
-            if (!_clients.Accounts.Contains(await _clients.Accounts.FirstOrDefaultAsync(x => x.Id == account.Id)))
+            if (!_clients.Accounts.Contains(_clients.Accounts.FirstOrDefault(x => x.Id == account.Id)))
             {
                 throw new ArgumentException("Аккаунт не найден!");
             }
