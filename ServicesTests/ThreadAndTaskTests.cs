@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Bogus;
 using ExportTool;
 using Models;
@@ -85,7 +85,7 @@ namespace ServicesTests
 
             //Act
 
-            var clientCsvList = export.DataExportToDatabase();
+            var clientCsvList = export.DataExportToDatabaseAsync().Result;
 
 
             Thread importThread = new(() =>
@@ -107,8 +107,8 @@ namespace ServicesTests
             {
                 clientService = new ClientService(new BankDbContext());
 
-                export.DataExportClientList(clientService.GetClients(new ClientFilter() { Passport = 5 }),
-                    @"C:\Users\37377\source\repos\.net-course-2022-Kolesnik\ExportFiles\\ClientFromDatabase");
+                Task task = export.DataExportClientListAsync(clientService.GetClients(new ClientFilter() { Passport = 5 }).Result,
+                   @"C:\Users\37377\source\repos\.net-course-2022-Kolesnik\ExportFiles\\ClientFromDatabase");
 
                 _output1.WriteLine($"Поток {Thread.CurrentThread.Name} записывает клиента из бд в файл");
             });

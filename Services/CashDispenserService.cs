@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Xunit.Abstractions;
 
 namespace Services
 {
@@ -15,25 +16,23 @@ namespace Services
     {
         public Task CashingOut(Client client)
         {
-            return Task.Factory.StartNew(() =>
+
+            var clientService = new ClientService(new BankDbContext());
+
+            var account = client.Accounts.FirstOrDefault(x => x.CurrencyName == "USD"));
+
+            if (account.Amount >= 100)
             {
-                var clientService = new ClientService(new BankDbContext());
+                account.Amount -= 100;
+            }
 
-                var account = client.Accounts.FirstOrDefault(x => x.CurrencyName == "USD");
-
-                if (account.Amount >= 100)
-                {
-                    account.Amount -= 100;
-                }
-
-                clientService.UpdateAccount(client.Id, new Account()
-                {
-                    Amount = account.Amount,
-                    CurrencyName = account.CurrencyName,
-                    ClientId = account.ClientId,
-                    Id = account.Id
-                });
-            });
+            clientService.UpdateAccount(client.Id, new Account()
+            {
+                Amount = account.Amount,
+                CurrencyName = account.CurrencyName,
+                ClientId = account.ClientId,
+                Id = account.Id
+            }).Wait();
         }
     }
 }

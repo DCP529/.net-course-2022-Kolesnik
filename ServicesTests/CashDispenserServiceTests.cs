@@ -1,24 +1,30 @@
-﻿using Bogus;
-using Models.ModelsDb;
+﻿using Models.ModelsDb;
 using Services;
 using Services.Filters;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
-using Xunit.Sdk;
+using Xunit.Abstractions;
 
 namespace ServicesTests
 {
     public class CashDispenserServiceTests
     {
+        private ITestOutputHelper _output;
+
+        public CashDispenserServiceTests(ITestOutputHelper outPut)
+        {
+            _output = outPut;
+        }
+
         [Fact]
         public void Cashing_OutTest()
         {
-            //Arrange
+            //Arrange            
+
+            ThreadPool.SetMaxThreads(20, 20);
+            ThreadPool.GetAvailableThreads(out var worker, out var completition);
 
             var clientService = new ClientService(new BankDbContext());
 
@@ -26,14 +32,18 @@ namespace ServicesTests
 
             //Act
 
-            var clients = clientService.GetClients(new ClientFilter()
+            var clients = clientService.GetClientsAsync(new ClientFilter()
             {
                 Passport = 20
             });
 
-            foreach (var item in clients)
+            var clients1 = clients.Result.Take(22);
+
+            foreach (var item in clients1)
             {
                 var task = cashDispenser.CashingOut(item);
+
+                _output.WriteLine($"Запущен поток  с  id {task.Id}, свободных потоков {worker}");
             }
 
             Task.Delay(2000).Wait();

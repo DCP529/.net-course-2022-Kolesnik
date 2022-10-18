@@ -35,7 +35,7 @@ namespace ServicesTests
             var whereClientFilter = employeeService.GetEmployees(new EmployeeFilter()
             {
                 BirthDayRange = new Tuple<DateTime, DateTime>(DateTime.Parse("01.01.1922"), DateTime.Parse("31.12.2004")),
-            });
+            }).Result;
 
             var orderByFilter = whereClientFilter.OrderBy(x => x.Id);
 
@@ -49,13 +49,14 @@ namespace ServicesTests
         }
 
         [Fact]
-        public void Update_EmployeeTests()
+        public async void Update_EmployeeTests()
         {
             //Arange
 
             var emploService = new EmployeeService(new BankDbContext());
 
-            var employee = emploService.GetEmployees(new EmployeeFilter() { Id = Guid.Parse("c187a3a2-943c-e65e-4660-0a89e2b4cca6") }).FirstOrDefault();
+            var employee = emploService.GetEmployees(new EmployeeFilter() { Id = Guid.Parse("c187a3a2-943c-e65e-4660-0a89e2b4cca6") })
+                .Result.FirstOrDefault();
 
             var newEmployee = new Employee()
             {
@@ -64,9 +65,10 @@ namespace ServicesTests
 
             //Act
 
-            emploService.Update(employee.Id, newEmployee);
+            await emploService.Update(employee.Id, newEmployee);
 
             var updateEmployee = emploService.GetEmployees(new EmployeeFilter() { Id = employee.Id })
+                .Result
                 .FirstOrDefault(x => x.Id == employee.Id);
 
             //Assert
@@ -74,23 +76,23 @@ namespace ServicesTests
         }
 
         [Fact]
-        public void Delete_EmployeeTests()
+        public async void Delete_EmployeeTests()
         {
             //Arange
 
             var emploService = new EmployeeService(new BankDbContext());
 
-            var employees = emploService.GetEmployees(new EmployeeFilter() { Passport = 1 });
+            var employees = emploService.GetEmployees(new EmployeeFilter() { Passport = 1 }).Result;
 
             var employee = emploService.GetEmployees(new EmployeeFilter()
             {
                 Passport = 1
-            }).FirstOrDefault();
+            }).Result.FirstOrDefault();
 
             //Act
-            emploService.Delete(employee.Id);
+            await emploService.Delete(employee.Id);
 
-            var deletedEmployee = emploService.GetEmployees(new EmployeeFilter() {Passport = 1});
+            var deletedEmployee = emploService.GetEmployees(new EmployeeFilter() {Passport = 1}).Result;
 
             //Assert
 
