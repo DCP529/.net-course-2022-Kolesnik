@@ -17,8 +17,8 @@ namespace Services
 
         public Employee ConvertClientToEmployee(Client client)
         {
-            Employee employee = new Employee() 
-            { 
+            Employee employee = new Employee()
+            {
                 FirstName = client.FirstName,
                 LastName = client.LastName,
                 Passport = client.Passport,
@@ -34,14 +34,14 @@ namespace Services
             person.Bonus += 1;
         }
 
-        public async Task AddToBlackListAsync<T>(T person) where T : Person // параллельно
+        public async Task AddToBlackListAsync<T>(T person) where T : Person
         {
             await Task.Run(() => BlackList.Add(person));
         }
 
-        public async Task<bool> IsPersonInBlackListAsync<T>(T person) where T : Person // параллельно
+        public async Task<bool> IsPersonInBlackListAsync<T>(T person) where T : Person
         {
-            return await Task.Run(() =>BlackList.Contains(person));
+            return await Task.Run(() => BlackList.Contains(person));
         }
     }
 }
