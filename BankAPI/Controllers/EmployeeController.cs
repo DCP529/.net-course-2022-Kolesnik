@@ -17,19 +17,19 @@ namespace BankAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<List<Employee>> GetEmployee(EmployeeFilter employee)
+        public async Task<List<Employee>> GetEmployeeAsync(EmployeeFilter employee)
         {
             return await _employeeService.GetEmployees(employee);
         }
 
         [HttpDelete]
-        public void DeleteEmployee(Guid id)
+        public async void DeleteEmployeeAsync(Guid id)
         {
-            _employeeService.DeleteAsync(id);
+            await _employeeService.DeleteAsync(id);
         }
 
         [HttpPost]
-        public void AddEmployee(Employee employee)
+        public void AddEmployeeAsync(Employee employee)
         {
             _employeeService.AddEmployeeAsync(employee);
         }
