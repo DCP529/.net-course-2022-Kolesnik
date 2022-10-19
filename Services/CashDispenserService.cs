@@ -27,7 +27,7 @@ namespace Services
                     account.Amount -= 100;
                 }
 
-                clientService.UpdateAccount(client.Id, new Account()
+                clientService.UpdateAccountAsync(client.Id, new Account()
                 {
                     Amount = account.Amount,
                     CurrencyName = account.CurrencyName,
