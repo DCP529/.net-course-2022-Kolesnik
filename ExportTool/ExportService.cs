@@ -14,73 +14,67 @@ namespace ExportTool
     {
         public async Task DataExportToFileAsync<T>(T person, string path) where T : Person
         {
-            await Task.Run(() =>
+            if (person is Client)
             {
-                using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate))
+                await using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate))
                 {
-                    using (StreamWriter sw = new StreamWriter(fs))
+                    await using (StreamWriter sw = new StreamWriter(fs))
                     {
-                        using (CsvWriter csv = new CsvWriter(sw, CultureInfo.CurrentCulture))
+                        await using (CsvWriter csv = new CsvWriter(sw, CultureInfo.CurrentCulture))
                         {
-                            csv.WriteRecord(person);
-                            csv.FlushAsync();
+                            await Task.Run(() => csv.WriteRecord(person));
+                            await csv.FlushAsync();
                         }
                     }
                 }
-            });
+            }
+            else
+            {
+                await using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate))
+                {
+                    await using (StreamWriter sw = new StreamWriter(fs))
+                    {
+                        await using (CsvWriter csv = new CsvWriter(sw, CultureInfo.CurrentCulture))
+                        {
+                            await Task.Run(() => csv.WriteRecord(person));
+                            await csv.FlushAsync();
+                        }
+                    }
+                }
+            }
         }
 
         public async Task DataExportClientListAsync(List<Client> clients, string path)
         {
-            await Task.Run(() =>
+            await using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate))
             {
-                using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate))
+                await using (StreamWriter sw = new StreamWriter(fs))
                 {
-                    using (StreamWriter sw = new StreamWriter(fs))
+                    await using (CsvWriter csv = new CsvWriter(sw, CultureInfo.CurrentCulture))
                     {
-                        using (CsvWriter csv = new CsvWriter(sw, CultureInfo.CurrentCulture))
-                        {
-                            csv.WriteRecordsAsync(clients);
-                            csv.FlushAsync();
-                        }
+                        await csv.WriteRecordsAsync(clients);
+                        await csv.FlushAsync();
                     }
                 }
-            });
+
+            }
         }
 
         public async Task<List<Client>> DataExportToDatabaseAsync()
         {
             string path = Path.Combine("C:\\Users\\37377\\source\\repos\\.net-course-2022-Kolesnik\\ExportFiles", "ClientList");
 
-            return await Task.Run(() =>
+            await using (FileStream fs = new FileStream(path, FileMode.Open))
             {
-                using (FileStream fs = new FileStream(path, FileMode.Open))
+                using (StreamReader sr = new StreamReader(fs))
                 {
-                    using (StreamReader sr = new StreamReader(fs))
+                    using (CsvReader reader = new CsvReader(sr, CultureInfo.CurrentCulture))
                     {
-                        using (CsvReader reader = new CsvReader(sr, CultureInfo.CurrentCulture))
-                        {
-                            return Task.Run(() => (List<Client>)reader.GetRecordsAsync<List<Client>>());
-                        }
+                        return await Task.Run(() => (List<Client>)reader.GetRecordsAsync<List<Client>>());
                     }
                 }
-            });
+            }
         }
-
-        public async Task SerializableExportToFileAsync<T>(T person, string path) where T : Person
-        {
-            await Task.Run(() =>
-            {
-                using (FileStream fs = new(path, FileMode.OpenOrCreate))
-                {
-                    using (StreamWriter sr = new(fs))
-                    {
-                        sr.WriteAsync(JsonConvert.SerializeObject(person));
-                    }
-                }
-            });
-        }
-
         public async Task<T> DeserializableImportFromFile<T>(string path) where T : Person
         {
             return await Task.Run(() =>
