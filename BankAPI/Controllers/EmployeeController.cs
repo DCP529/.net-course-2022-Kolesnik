@@ -35,9 +35,9 @@ namespace BankAPI.Controllers
         }
 
         [HttpPut]
-        public void UpdateEmployee(Guid employeeId, Employee employee)
+        public async void UpdateEmployee(Guid employeeId, Employee employee)
         {
-            _employeeService.UpdateAsync(employeeId, employee);
+            await _employeeService.UpdateAsync(employeeId, employee);
         }
     }
 }
