@@ -17,12 +17,9 @@ namespace BankAPI.Controllers
         }
 
         [HttpGet]
-        public List<Employee> GetEmployee(Guid employeeId)
+        public async Task<List<Employee>> GetEmployee(EmployeeFilter employee)
         {
-            return _employeeService.GetEmployees(new EmployeeFilter()
-            {
-                Id = employeeId
-            }).Result;
+            return await _employeeService.GetEmployees(employee);
         }
 
         [HttpDelete]
