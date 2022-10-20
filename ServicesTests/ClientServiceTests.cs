@@ -30,10 +30,10 @@ namespace ServicesTests
 
             foreach (var client in clients)
             {
-                clientService.AddClient(client);
+                clientService.AddClientAsync(client);
             }
 
-            var whereClientFilter = clientService.GetClients(new ClientFilter()
+            var whereClientFilter = clientService.GetClientsAsync(new ClientFilter()
             {
                 BirthDayRange = new Tuple<DateTime, DateTime>(DateTime.Parse("01.01.1922"), DateTime.Parse("31.12.2004")),
             }).Result;
@@ -68,45 +68,45 @@ namespace ServicesTests
 
             //Act
 
-            clientService.AddClient(client).Wait();
+            clientService.AddClientAsync(client);
 
             client.FirstName = "Станислав";
 
-            clientService.Update(Guid.Parse("4c233c84-d0c6-4ff9-bb6b-dfbd517be79c"), client).Wait();
+            clientService.UpdateAsync(Guid.Parse("4c233c84-d0c6-4ff9-bb6b-dfbd517be79c"), client).Wait();
 
-            var updateClient = clientService.GetClientById(Guid.Parse("4c233c84-d0c6-4ff9-bb6b-dfbd517be79c")).Result;
+            var updateClient = clientService.GetClientByIdAsync(Guid.Parse("4c233c84-d0c6-4ff9-bb6b-dfbd517be79c")).Result;
 
-            clientService.Update(Guid.Parse("4c233c84-d0c6-4ff9-bb6b-dfbd517be79c"), client).Wait();
+            clientService.UpdateAsync(Guid.Parse("4c233c84-d0c6-4ff9-bb6b-dfbd517be79c"), client).Wait();
 
-            updateClient = clientService.GetClientById(Guid.Parse("4c233c84-d0c6-4ff9-bb6b-dfbd517be79c")).Result;
+            updateClient = clientService.GetClientByIdAsync(Guid.Parse("4c233c84-d0c6-4ff9-bb6b-dfbd517be79c")).Result;
 
             //Assert
             Assert.Equal(client.Passport, updateClient.Passport);
         }
 
         [Fact]
-        public void Delete_ClientTests()
+        public async void Delete_ClientTests()
         {
             //Arange
 
             var clientService = new ClientService(new BankDbContext());
 
-            var clients = clientService.GetClients(new ClientFilter()
+            var clients = clientService.GetClientsAsync(new ClientFilter()
             {
                 Passport = 1
-            }).Result;
+            });
 
             //Act
             
-            clientService.Delete(Guid.Parse("04bcee72-6c75-419c-93ee-2e27634908e7"));
+            await clientService.DeleteAsync(Guid.Parse("04bcee72-6c75-419c-93ee-2e27634908e7"));
 
-            var deletedClient = clientService.GetClients(new ClientFilter()
+            var deletedClient = clientService.GetClientsAsync(new ClientFilter()
             {
                 Passport = 1
-            }).Result;
+            });
 
             //Assert
-            Assert.Equal(deletedClient.Count, clients.Count - 1);
+            Assert.Equal(deletedClient.Result.Count, clients.Result.Count - 1);
         }
 
         

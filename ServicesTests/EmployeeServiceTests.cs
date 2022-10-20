@@ -29,7 +29,7 @@ namespace ServicesTests
 
             foreach (var employee in employees)
             {
-                employeeService.AddEmployee(employee);
+                employeeService.AddEmployeeAsync(employee);
             }
 
             var whereClientFilter = employeeService.GetEmployees(new EmployeeFilter()
@@ -65,7 +65,7 @@ namespace ServicesTests
 
             //Act
 
-            await emploService.Update(employee.Id, newEmployee);
+            await emploService.UpdateAsync(employee.Id, newEmployee);
 
             var updateEmployee = emploService.GetEmployees(new EmployeeFilter() { Id = employee.Id })
                 .Result
@@ -90,7 +90,7 @@ namespace ServicesTests
             }).Result.FirstOrDefault();
 
             //Act
-            await emploService.Delete(employee.Id);
+            await emploService.DeleteAsync(employee.Id);
 
             var deletedEmployee = emploService.GetEmployees(new EmployeeFilter() {Passport = 1}).Result;
 

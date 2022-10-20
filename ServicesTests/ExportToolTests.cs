@@ -31,7 +31,7 @@ namespace ServicesTests
         public async void Data_Export_ClientList_FileTests()
         {
             //Arrange
-            var client = new List<Client>() { new Client() { FirstName = "Mark" , Passport = 20}, new Client() { FirstName = "Oleg" , Passport = 20 } };
+            var client = new List<Client>() { new Client() { FirstName = "Mark", Passport = 20 }, new Client() { FirstName = "Oleg", Passport = 20 } };
 
             var exportData = new ExportService();
 
@@ -53,8 +53,43 @@ namespace ServicesTests
 
             foreach (var item in clientListCsv.Result)
             {
-                clientService.AddClient(item);
-            }            
+                clientService.AddClientAsync(item);
+            }
+        }
+
+        [Fact]
+        public async void Serialize_DeserializeTests()
+        {
+            //Arange
+
+            ExportService exportService = new ExportService();
+
+            //Act
+
+            await exportService.SerializableExportToFileAsync(new Client()
+            {
+                FirstName = "Bob",
+                LastName = "Smith",
+                Passport = 22,
+                Accounts = new List<Account>() 
+                { 
+                    new Account() 
+                    {
+                        CurrencyName = "USD"
+                    }, 
+                    new Account() 
+                    { 
+                        CurrencyName = "RUB"
+                    } 
+                }
+            },
+            @"C:\Users\37377\source\repos\.net-course-2022-Kolesnik\ExportFiles\\JsonClientList");
+
+
+            var client = await exportService.DeserializableImportFromFile<Client>(@"C:\Users\37377\source\repos\.net-course-2022-Kolesnik\ExportFiles\\JsonClientList");
+            //Assert
+
+            Assert.Equal(typeof(Client), client.GetType());
         }
     }
 }

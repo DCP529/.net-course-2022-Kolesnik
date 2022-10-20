@@ -2,6 +2,7 @@
 using CsvHelper;
 using Models;
 using Models.ModelsDb;
+using Newtonsoft.Json;
 using Services;
 using System.Collections.Generic;
 using System.Globalization;
@@ -73,6 +74,34 @@ namespace ExportTool
                     }
                 }
             }
+        }
+
+        public async Task SerializableExportToFileAsync<T>(T person, string path) where T : Person
+        {
+            await Task.Run(() =>
+            {
+                using (FileStream fs = new(path, FileMode.OpenOrCreate))
+                {
+                    using (StreamWriter sr = new(fs))
+                    {
+                        sr.WriteAsync(JsonConvert.SerializeObject(person));
+                    }
+                }
+            });
+        }
+
+        public async Task<T> DeserializableImportFromFile<T>(string path) where T : Person
+        {
+            return await Task.Run(() =>
+            {
+                using (FileStream fs = new(path, FileMode.Open))
+                {
+                    using (StreamReader sr = new(fs))
+                    {
+                        return JsonConvert.DeserializeObject<T>(sr.ReadToEnd());
+                    }
+                }
+            });
         }
     }
 }

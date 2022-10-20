@@ -94,7 +94,7 @@ namespace ServicesTests
 
                 foreach (var item in clientCsvList)
                 {
-                    clientService.AddClient(item);
+                    clientService.AddClientAsync(item);
 
                     _output1.WriteLine($"Поток {Thread.CurrentThread.Name} добавляет клиента в бд из файла");
 
@@ -107,7 +107,7 @@ namespace ServicesTests
             {
                 clientService = new ClientService(new BankDbContext());
 
-                Task task = export.DataExportClientListAsync(clientService.GetClients(new ClientFilter() { Passport = 5 }).Result,
+                Task task = export.DataExportClientListAsync(clientService.GetClientsAsync(new ClientFilter() { Passport = 5 }).Result,
                    @"C:\Users\37377\source\repos\.net-course-2022-Kolesnik\ExportFiles\\ClientFromDatabase");
 
                 _output1.WriteLine($"Поток {Thread.CurrentThread.Name} записывает клиента из бд в файл");
