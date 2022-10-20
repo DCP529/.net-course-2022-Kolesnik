@@ -23,7 +23,7 @@ namespace ServicesTests
                 Amount = 100,
                 FromCurrency = "USD",
                 ToCurrency = "RUB",
-                ApiKey = ""
+                ApiKey = "DeGteKn6cectyYwXvGPdCEvkW9fL8s"
             };
 
             //Act
