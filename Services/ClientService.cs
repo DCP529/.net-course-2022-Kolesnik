@@ -230,7 +230,7 @@ namespace Services
 
         public async void AddClientAsync(Client client)
         {
-            ClientDb clientDb = new ClientDb() { Id = Guid.NewGuid() };
+            ClientDb clientDb = new ClientDb() { Id = client.Id};
 
             var defaultAccount = new AccountDb()
             {
@@ -250,7 +250,6 @@ namespace Services
             var clientMapper = new Mapper(clientConfig);
 
             clientDb = clientMapper.Map<ClientDb>(client);
-            clientDb.Id = Guid.NewGuid();
 
             if (client.BirthDate > DateTime.Parse("31.12.2004"))
             {
